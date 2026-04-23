@@ -1,0 +1,99 @@
+.root {
+  min-height: 100vh;
+  background: #0f1923;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.bgPattern {
+  position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px);
+  pointer-events: none; z-index: 0;
+}
+
+.accentBar {
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #c9a96e 40%, #c9a96e 60%, transparent 100%);
+  position: relative; z-index: 2;
+}
+
+.nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  position: relative; z-index: 2;
+}
+
+.logo { display: flex; align-items: center; gap: 10px; }
+
+.logoIcon {
+  width: 32px; height: 32px;
+  border: 1.5px solid #c9a96e; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.logoText {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 600; color: #e8dcc8;
+}
+
+.navLinks { display: flex; gap: 24px; align-items: center; }
+
+.navLink {
+  font-size: 13px; color: rgba(255,255,255,0.45);
+  cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.navLink:hover { color: #c9a96e; }
+
+.navLinkLogout {
+  font-size: 13px; color: rgba(255,100,100,0.6);
+  cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase;
+  transition: color 0.2s;
+}
+.navLinkLogout:hover { color: #f08080; }
+
+.body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 24px; position: relative; z-index: 2;
+}
+
+.welcome { text-align: center; margin-bottom: 48px; }
+
+.title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px; font-weight: 600; color: #e8dcc8; margin-bottom: 8px;
+}
+
+.subtitle { font-size: 15px; color: rgba(255,255,255,0.4); }
+
+.cards {
+  display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;
+}
+
+.card {
+  width: 240px;
+  background: rgba(255,255,255,0.04);
+  border: 0.5px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 32px 24px;
+  cursor: pointer; text-align: center;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.card:hover {
+  border-color: #c9a96e;
+  background: rgba(201,169,110,0.06);
+  transform: translateY(-4px);
+}
+
+.cardIcon { margin-bottom: 20px; }
+
+.cardTitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px; font-weight: 600; color: #e8dcc8; margin-bottom: 8px;
+}
+
+.cardDesc { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.5; }
