@@ -14,8 +14,13 @@ const naturezas = [
 
 export default function ExecucaoPage() {
   const navigate = useNavigate()
+  const [numeroExecucao, setNumeroExecucao] = useState('')
+  const [apenado, setApenado] = useState(null)
+  const [buscaErro, setBuscaErro] = useState('')
+  const [buscando, setBuscando] = useState(false)
+
   const [form, setForm] = useState({
-    apenado_id: '', pena_anos: 0, pena_meses: 0, pena_dias: 0,
+    pena_anos: 0, pena_meses: 0, pena_dias: 0,
     natureza_crime: 'comum', reincidente: false,
     data_inicio_pena: '', detracao_inicio: '', detracao_fim: '',
     dias_trabalhados: 0, horas_estudo: 0, obras_lidas: 0,
@@ -24,6 +29,22 @@ export default function ExecucaoPage() {
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const buscarApenado = async () => {
+    if (!numeroExecucao.trim()) return
+    setBuscaErro(''); setApenado(null); setBuscando(true)
+    try {
+      const res = await fetch('http://localhost:8000/api/v1/apenados/')
+      const lista = await res.json()
+      const encontrado = lista.find(a => a.numero_execucao === numeroExecucao.trim())
+      if (!encontrado) throw new Error('Apenado não encontrado. Verifique o número da execução.')
+      setApenado(encontrado)
+    } catch (err) {
+      setBuscaErro(err.message)
+    } finally {
+      setBuscando(false)
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
@@ -31,11 +52,12 @@ export default function ExecucaoPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!apenado) { setErro('Busque e selecione um apenado antes de calcular.'); return }
     setErro(''); setResultado(null); setLoading(true)
     try {
       const payload = {
         ...form,
-        apenado_id: parseInt(form.apenado_id) || 1,
+        apenado_id: apenado.id,
         pena_anos: parseInt(form.pena_anos) || 0,
         pena_meses: parseInt(form.pena_meses) || 0,
         pena_dias: parseInt(form.pena_dias) || 0,
@@ -45,14 +67,22 @@ export default function ExecucaoPage() {
         detracao_inicio: form.detracao_inicio || null,
         detracao_fim: form.detracao_fim || null,
       }
-      const res = await fetch('http://localhost:8000/api/v1/execucoes/calcular', {
+
+      const resSalvar = await fetch('http://localhost:8000/api/v1/execucoes/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(JSON.stringify(data.detail) || 'Erro no cálculo')
-      setResultado(data)
+      const dadosSalvos = await resSalvar.json()
+      if (!resSalvar.ok) throw new Error(JSON.stringify(dadosSalvos.detail) || 'Erro ao salvar')
+
+      const resCalculo = await fetch('http://localhost:8000/api/v1/execucoes/calcular', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const dadosCalculo = await resCalculo.json()
+      setResultado(dadosCalculo)
     } catch (err) {
       setErro(err.message)
     } finally {
@@ -60,7 +90,7 @@ export default function ExecucaoPage() {
     }
   }
 
-  const formatarData = (d) => d ? new Date(d).toLocaleDateString('pt-BR') : '-'
+  const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
   return (
     <div className={styles.root}>
@@ -83,6 +113,30 @@ export default function ExecucaoPage() {
           <h1 className={styles.title}>Registrar Execução Penal</h1>
           <div className={styles.divider} />
 
+          <div className={styles.buscaCard}>
+            <p className={styles.sectionTitle}>Apenado</p>
+            <div className={styles.buscaRow}>
+              <input
+                className={styles.input}
+                placeholder="Número da execução (ex: 0001234-56.2024.8.18.0001)"
+                value={numeroExecucao}
+                onChange={e => setNumeroExecucao(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && buscarApenado()}
+              />
+              <button className={styles.btnBusca} onClick={buscarApenado} disabled={buscando} type="button">
+                {buscando ? '...' : 'Buscar'}
+              </button>
+            </div>
+            {buscaErro && <p className={styles.erro}>{buscaErro}</p>}
+            {apenado && (
+              <div className={styles.apenadoInfo}>
+                <span className={styles.apenadoBadge}>✓ Apenado encontrado</span>
+                <span className={styles.apenadoNome}>{apenado.nome}</span>
+                <span className={styles.apenadoDetalhe}>Nascimento: {formatarData(apenado.data_nascimento)}</span>
+              </div>
+            )}
+          </div>
+
           <form onSubmit={handleSubmit} className={styles.form}>
             <div className={styles.grid}>
               <div className={styles.section}>
@@ -101,19 +155,16 @@ export default function ExecucaoPage() {
                     <input className={styles.input} type="number" name="pena_dias" min="0" max="29" value={form.pena_dias} onChange={handleChange} />
                   </div>
                 </div>
-
                 <div className={styles.field}>
                   <label className={styles.label}>Natureza do crime</label>
                   <select className={styles.input} name="natureza_crime" value={form.natureza_crime} onChange={handleChange}>
                     {naturezas.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
                   </select>
                 </div>
-
                 <div className={styles.checkField}>
                   <input type="checkbox" id="reincidente" name="reincidente" checked={form.reincidente} onChange={handleChange} />
                   <label htmlFor="reincidente" className={styles.checkLabel}>Réu reincidente</label>
                 </div>
-
                 <div className={styles.field}>
                   <label className={styles.label}>Início da pena</label>
                   <input className={styles.input} type="date" name="data_inicio_pena" value={form.data_inicio_pena} onChange={handleChange} required />
@@ -132,7 +183,6 @@ export default function ExecucaoPage() {
                     <input className={styles.input} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} />
                   </div>
                 </div>
-
                 <p className={styles.sectionTitle} style={{marginTop: '20px'}}>Remição</p>
                 <div className={styles.field}>
                   <label className={styles.label}>Dias trabalhados</label>
@@ -151,14 +201,14 @@ export default function ExecucaoPage() {
 
             {erro && <p className={styles.erro}>{erro}</p>}
 
-            <button className={styles.btn} type="submit" disabled={loading}>
-              {loading ? 'Calculando...' : 'Calcular Execução Penal'}
+            <button className={styles.btn} type="submit" disabled={loading || !apenado}>
+              {loading ? 'Calculando e salvando...' : 'Calcular e Salvar Execução Penal'}
             </button>
           </form>
 
           {resultado && (
             <div className={styles.resultado}>
-              <h2 className={styles.resultadoTitle}>Resultado do Cálculo</h2>
+              <h2 className={styles.resultadoTitle}>✓ Execução salva e calculada</h2>
               <div className={styles.resultadoGrid}>
                 <div className={styles.resultadoCard}>
                   <span className={styles.resultadoLabel}>Regime inicial</span>
