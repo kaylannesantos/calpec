@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/layout/Navbar'
 import styles from './ApenadoPage.module.css'
 
 export default function ApenadoPage() {
@@ -34,18 +35,7 @@ export default function ApenadoPage() {
   return (
     <div className={styles.root}>
       <div className={styles.bgPattern} />
-      <div className={styles.accentBar} />
-      <nav className={styles.nav}>
-        <div className={styles.logo} onClick={() => navigate('/home')}>
-          <div className={styles.logoIcon}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L9.5 6H14.5L10.5 9L12 14L8 11L4 14L5.5 9L1.5 6H6.5L8 1Z" fill="#c9a96e"/>
-            </svg>
-          </div>
-          <span className={styles.logoText}>CalPEC</span>
-        </div>
-        <span className={styles.navLink} onClick={() => navigate('/home')}>← Voltar</span>
-      </nav>
+      <Navbar showLinks />
       <div className={styles.body}>
         <div className={styles.card}>
           <h1 className={styles.title}>Registrar Apenado</h1>

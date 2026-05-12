@@ -1,42 +1,20 @@
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/layout/Navbar'
 import styles from './HomePage.module.css'
 
 export default function HomePage() {
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user') || '{}')
 
-  const handleLogout = () => {
-    localStorage.clear()
-    navigate('/login')
-  }
-
   return (
     <div className={styles.root}>
       <div className={styles.bgPattern} />
-      <div className={styles.accentBar} />
-
-      <nav className={styles.nav}>
-        <div className={styles.logo}>
-          <div className={styles.logoIcon}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L9.5 6H14.5L10.5 9L12 14L8 11L4 14L5.5 9L1.5 6H6.5L8 1Z" fill="#c9a96e"/>
-            </svg>
-          </div>
-          <span className={styles.logoText}>CalPEC</span>
-        </div>
-        <div className={styles.navLinks}>
-          <span className={styles.navLink} onClick={() => navigate('/apenados')}>Apenados</span>
-          <span className={styles.navLink} onClick={() => navigate('/execucao')}>Nova Execução</span>
-          <span className={styles.navLinkLogout} onClick={handleLogout}>Sair</span>
-        </div>
-      </nav>
-
+      <Navbar showLinks />
       <div className={styles.body}>
         <div className={styles.welcome}>
           <h1 className={styles.title}>Bem-vindo, {user.nome?.split(' ')[0] || 'Usuário'}</h1>
           <p className={styles.subtitle}>O que deseja fazer hoje?</p>
         </div>
-
         <div className={styles.cards}>
           <div className={styles.card} onClick={() => navigate('/apenados')}>
             <div className={styles.cardIcon}>
@@ -49,7 +27,6 @@ export default function HomePage() {
             <h2 className={styles.cardTitle}>Registrar Apenado</h2>
             <p className={styles.cardDesc}>Cadastre um novo condenado no sistema</p>
           </div>
-
           <div className={styles.card} onClick={() => navigate('/execucao')}>
             <div className={styles.cardIcon}>
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" strokeWidth="1.5" strokeLinecap="round">
