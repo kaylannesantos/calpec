@@ -29,7 +29,8 @@ export default function Navbar({ showLinks = false }) {
           {showLinks && (
             <>
               <span className={`${styles.link} ${location.pathname === '/apenados' ? styles.active : ''}`} onClick={() => navigate('/apenados')}>Apenados</span>
-              <span className={`${styles.link} ${location.pathname === '/execucao' ? styles.active : ''}`} onClick={() => navigate('/execucao')}>Nova Execução</span>
+              <span className={`${styles.link} ${location.pathname === '/execucoes' ? styles.active : ''}`} onClick={() => navigate('/execucoes')}>Execuções</span>
+              <span className={`${styles.link} ${location.pathname === '/execucao' ? styles.active : ''}`} onClick={() => navigate('/execucao')}>+ Nova</span>
               <span className={styles.linkLogout} onClick={handleLogout}>Sair</span>
             </>
           )}

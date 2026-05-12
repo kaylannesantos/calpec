@@ -4,6 +4,7 @@ import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
 import ApenadoPage from './pages/ApenadoPage'
 import ExecucaoPage from './pages/ExecucaoPage'
+import ExecucoesPage from './pages/ExecucoesPage'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/apenados" element={<ApenadoPage />} />
         <Route path="/execucao" element={<ExecucaoPage />} />
+        <Route path="/execucoes" element={<ExecucoesPage />} />
       </Routes>
     </BrowserRouter>
   )

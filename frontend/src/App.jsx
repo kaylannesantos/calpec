@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
 import ApenadoPage from './pages/ApenadoPage'
 import ExecucaoPage from './pages/ExecucaoPage'
+import ExecucoesPage from './pages/ExecucoesPage'
 
 function App() {
   return (
@@ -10,9 +12,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/registrar" element={<RegisterPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/apenados" element={<ApenadoPage />} />
         <Route path="/execucao" element={<ExecucaoPage />} />
+        <Route path="/execucoes" element={<ExecucoesPage />} />
       </Routes>
     </BrowserRouter>
   )

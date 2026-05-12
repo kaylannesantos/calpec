@@ -1,0 +1,37 @@
+.root { min-height: 100vh; background: #0f1923; display: flex; flex-direction: column; position: relative; }
+.bgPattern { position: fixed; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px); pointer-events: none; z-index: 0; }
+.body { flex: 1; display: flex; justify-content: center; padding: 36px 24px; position: relative; z-index: 2; }
+.container { width: 100%; max-width: 800px; }
+.pageHeader { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #e8dcc8; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: rgba(255,255,255,0.35); }
+.acoes { display: flex; gap: 10px; align-items: center; }
+.btnPrimario { background: #c9a96e; border: none; border-radius: 8px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: #0f1923; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
+.btnPrimario:hover { background: #d4b87a; }
+.btnSecundario { background: transparent; border: 0.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btnSecundario:hover { border-color: #c9a96e; color: #c9a96e; }
+.filtroBar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.filtroLabel { font-size: 12px; color: rgba(255,255,255,0.4); white-space: nowrap; }
+.filtroSelect { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #e8dcc8; outline: none; cursor: pointer; }
+.filtroSelect option { background: #1a2633; }
+.divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 20px; }
+.lista { display: flex; flex-direction: column; gap: 14px; }
+.card { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px 24px; transition: border-color 0.2s; }
+.card:hover { border-color: rgba(201,169,110,0.3); }
+.cardTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.cardNome { font-size: 15px; font-weight: 500; color: #e8dcc8; display: block; margin-bottom: 8px; }
+.cardTags { display: flex; gap: 6px; flex-wrap: wrap; }
+.cardId { font-size: 12px; color: rgba(255,255,255,0.2); }
+.badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+.badgeFechado { background: rgba(240,128,128,0.15); color: #f08080; }
+.badgeSemiaberto { background: rgba(255,185,0,0.15); color: #ffd166; }
+.badgeAberto { background: rgba(126,200,138,0.15); color: #7ec88a; }
+.badgeDefault { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+.badgeReincidente { background: rgba(240,128,128,0.1); color: #f08080; }
+.badgeNatureza { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.cardGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cardInfo { display: flex; flex-direction: column; gap: 3px; }
+.infoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
+.infoValor { font-size: 14px; color: #e8dcc8; font-weight: 500; }
+.vazioBox { text-align: center; padding: 48px 24px; }
+.vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
