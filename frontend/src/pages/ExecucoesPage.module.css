@@ -64,3 +64,38 @@
 /* Vazio */
 .vazioBox { text-align: center; padding: 48px 24px; }
 .vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+
+/* Remição */
+.remicaoWrap { margin-top: 16px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 14px; }
+.btnRemicao { background: transparent; border: 0.5px solid rgba(201,169,110,0.3); color: #c9a96e; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.btnRemicao:hover { background: rgba(201,169,110,0.08); }
+.remicaoBox { margin-top: 14px; }
+.remicaoForm { background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; margin-bottom: 12px; }
+.remicaoTitulo { font-size: 11px; color: #c9a96e; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+.remicaoGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px; }
+.remicaoField { display: flex; flex-direction: column; gap: 5px; margin-bottom: 10px; }
+.remicaoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
+.remicaoInput { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 7px; padding: 8px 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #e8dcc8; outline: none; width: 100%; box-sizing: border-box; }
+.remicaoInput:focus { border-color: #c9a96e; }
+.remicaoInput option { background: #1a2633; }
+.previa { font-size: 12px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+.previa strong { color: #c9a96e; }
+.remicaoErro { font-size: 12px; color: #f08080; margin-bottom: 8px; }
+.remicaoSucesso { font-size: 12px; color: #7ec88a; margin-bottom: 8px; }
+.btnSalvar { background: #c9a96e; border: none; border-radius: 7px; padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: #0f1923; cursor: pointer; transition: background 0.2s; }
+.btnSalvar:hover { background: #d4b87a; }
+.btnSalvar:disabled { opacity: 0.6; cursor: not-allowed; }
+.historico { background: rgba(255,255,255,0.02); border: 0.5px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px 16px; }
+.historicoTitulo { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; }
+.historicoItem { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
+.historicoItem:last-child { border-bottom: none; }
+.historicoInfo { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.historicoBadge { font-size: 11px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.badge_trabalho { background: rgba(126,200,138,0.12); color: #7ec88a; }
+.badge_estudo { background: rgba(100,180,255,0.12); color: #64b4ff; }
+.badge_leitura { background: rgba(201,169,110,0.12); color: #c9a96e; }
+.historicoDetalhe { font-size: 12px; color: rgba(255,255,255,0.5); }
+.historicoObs { font-size: 12px; color: rgba(255,255,255,0.3); font-style: italic; }
+.historicoRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.historicoDias { font-size: 13px; font-weight: 500; color: #7ec88a; }
+.historicoData { font-size: 11px; color: rgba(255,255,255,0.3); }

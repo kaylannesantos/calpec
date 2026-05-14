@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.v1.endpoints import auth, apenados, advogados, execucoes
+from app.api.v1.endpoints import auth, apenados, advogados, execucoes, remicoes
 
 app = FastAPI(
     title="CalPEC API",
@@ -20,6 +20,7 @@ app.include_router(auth.router, prefix="/api/v1/auth", tags=["Autenticação"])
 app.include_router(apenados.router, prefix="/api/v1/apenados", tags=["Apenados"])
 app.include_router(advogados.router, prefix="/api/v1/advogados", tags=["Advogados"])
 app.include_router(execucoes.router, prefix="/api/v1/execucoes", tags=["Execuções"])
+app.include_router(remicoes.router, prefix="/api/v1/remicoes", tags=["Remições"])
 
 @app.get("/")
 def root():
