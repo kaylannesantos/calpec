@@ -15,23 +15,52 @@
 .filtroSelect { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #e8dcc8; outline: none; cursor: pointer; }
 .filtroSelect option { background: #1a2633; }
 .divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 20px; }
-.lista { display: flex; flex-direction: column; gap: 14px; }
-.card { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px 24px; transition: border-color 0.2s; }
-.card:hover { border-color: rgba(201,169,110,0.3); }
-.cardTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+.lista { display: flex; flex-direction: column; gap: 16px; }
+.card { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 24px; transition: border-color 0.2s; }
+.card:hover { border-color: rgba(201,169,110,0.25); }
+.cardTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
 .cardNome { font-size: 15px; font-weight: 500; color: #e8dcc8; display: block; margin-bottom: 8px; }
 .cardTags { display: flex; gap: 6px; flex-wrap: wrap; }
 .cardId { font-size: 12px; color: rgba(255,255,255,0.2); }
 .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-.badgeFechado { background: rgba(240,128,128,0.15); color: #f08080; }
-.badgeSemiaberto { background: rgba(255,185,0,0.15); color: #ffd166; }
-.badgeAberto { background: rgba(126,200,138,0.15); color: #7ec88a; }
-.badgeDefault { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+.badgeFechado { background: rgba(201,169,110,0.12); color: #c9a96e; }
+.badgeAlerta { background: rgba(255,209,102,0.12); color: #ffd166; }
 .badgeReincidente { background: rgba(240,128,128,0.1); color: #f08080; }
-.badgeNatureza { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.badgeNatureza { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
+
+/* Etapas */
+.etapas { display: flex; align-items: flex-start; margin-bottom: 18px; }
+.etapaGrupo { display: flex; align-items: center; flex: 1; }
+.etapaGrupo:last-child { flex: 0; }
+.etapaItem { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.etapaDot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; flex-shrink: 0; }
+.etapaFeita { background: #c9a96e; border-color: #c9a96e; }
+.etapaAtual { background: #c9a96e; border-color: #c9a96e; box-shadow: 0 0 0 3px rgba(201,169,110,0.2); }
+.etapaLabel { font-size: 10px; color: rgba(255,255,255,0.3); text-align: center; white-space: nowrap; }
+.etapaLabelAtiva { color: #c9a96e; }
+.etapaLinha { flex: 1; height: 1px; background: rgba(255,255,255,0.08); margin: 0 4px; margin-bottom: 16px; }
+.etapaLinhaFeita { background: #c9a96e; }
+
+/* Progresso */
+.progressoWrap { margin-bottom: 16px; }
+.progressoHeader { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.progressoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
+.progressoPct { font-size: 12px; color: #c9a96e; font-weight: 500; }
+.progressoPctAlerta { color: #ffd166; }
+.progressoBar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
+.progressoFill { height: 100%; border-radius: 3px; background: #c9a96e; transition: width 0.4s; }
+.progressoFillAlerta { background: #ffd166; }
+
+/* Grid de infos */
 .cardGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .cardInfo { display: flex; flex-direction: column; gap: 3px; }
 .infoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
-.infoValor { font-size: 14px; color: #e8dcc8; font-weight: 500; }
+.infoValor { font-size: 13px; color: #e8dcc8; font-weight: 500; }
+.infoAlerta { color: #ffd166; }
+
+/* Alerta */
+.alertaBox { margin-top: 14px; font-size: 12px; color: #ffd166; background: rgba(255,209,102,0.06); border: 0.5px solid rgba(255,209,102,0.2); border-radius: 8px; padding: 8px 14px; }
+
+/* Vazio */
 .vazioBox { text-align: center; padding: 48px 24px; }
 .vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
