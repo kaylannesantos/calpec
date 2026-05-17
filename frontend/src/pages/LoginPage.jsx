@@ -41,8 +41,8 @@ export default function LoginPage() {
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <Logo size={52} />
-            <h1 className={styles.title}>Acesso ao Sistema</h1>
-            <p className={styles.subtitle}>Execução Criminal — LEP</p>
+            <h1 className={styles.title}>CalPEC</h1>
+            <p className={styles.subtitle}>SISTEMA ELETRÔNICO DE EXECUÇÃO CRIMINAL</p>
           </div>
           <div className={styles.divider} />
           <form onSubmit={handleSubmit}>

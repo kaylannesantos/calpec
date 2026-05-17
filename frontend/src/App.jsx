@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import RotaProtegida from './components/auth/RotaProtegida'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
@@ -13,10 +14,11 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registrar" element={<RegisterPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/apenados" element={<ApenadoPage />} />
-        <Route path="/execucao" element={<ExecucaoPage />} />
-        <Route path="/execucoes" element={<ExecucoesPage />} />
+
+        <Route path="/home" element={<RotaProtegida><HomePage /></RotaProtegida>} />
+        <Route path="/apenados" element={<RotaProtegida><ApenadoPage /></RotaProtegida>} />
+        <Route path="/execucao" element={<RotaProtegida><ExecucaoPage /></RotaProtegida>} />
+        <Route path="/execucoes" element={<RotaProtegida><ExecucoesPage /></RotaProtegida>} />
       </Routes>
     </BrowserRouter>
   )
