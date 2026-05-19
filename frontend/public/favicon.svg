@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Fundo -->
+  <rect width="64" height="64" rx="14" fill="#0f1923"/>
+
+  <!-- Pivô central -->
+  <circle cx="32" cy="14" r="3" fill="#c9a96e"/>
+
+  <!-- Haste vertical -->
+  <line x1="32" y1="14" x2="32" y2="48" stroke="#c9a96e" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Base -->
+  <line x1="22" y1="48" x2="42" y2="48" stroke="#c9a96e" stroke-width="3" stroke-linecap="round"/>
+  <line x1="18" y1="53" x2="46" y2="53" stroke="#c9a96e" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Braço horizontal -->
+  <line x1="10" y1="24" x2="54" y2="24" stroke="#c9a96e" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Prato esquerdo -->
+  <line x1="10" y1="24" x2="10" y2="34" stroke="#c9a96e" stroke-width="1.5"/>
+  <path d="M4 34 Q10 39 16 34" stroke="#c9a96e" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- Prato direito -->
+  <line x1="54" y1="24" x2="54" y2="34" stroke="#c9a96e" stroke-width="1.5"/>
+  <path d="M48 34 Q54 39 60 34" stroke="#c9a96e" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

@@ -11,10 +11,6 @@ export default function HomePage() {
       <div className={styles.bgPattern} />
       <Navbar showLinks />
       <div className={styles.body}>
-        <div className={styles.welcome}>
-          <h1 className={styles.title}>Bem-vindo, {user.nome?.split(' ')[0] || 'Usuário'}</h1>
-          <p className={styles.subtitle}>O que deseja fazer hoje?</p>
-        </div>
         <div className={styles.cards}>
           <div className={styles.card} onClick={() => navigate('/apenados')}>
             <div className={styles.cardIcon}>
