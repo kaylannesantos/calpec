@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/layout/Navbar'
 import styles from './ExecucaoPage.module.css'
 
 const naturezas = [
@@ -14,7 +15,8 @@ const naturezas = [
 
 export default function ExecucaoPage() {
   const navigate = useNavigate()
-  const [numeroExecucao, setNumeroExecucao] = useState('')
+  const [busca, setBusca] = useState('')
+  const [resultados, setResultados] = useState([])
   const [apenado, setApenado] = useState(null)
   const [buscaErro, setBuscaErro] = useState('')
   const [buscando, setBuscando] = useState(false)
@@ -30,19 +32,33 @@ export default function ExecucaoPage() {
   const [loading, setLoading] = useState(false)
 
   const buscarApenado = async () => {
-    if (!numeroExecucao.trim()) return
-    setBuscaErro(''); setApenado(null); setBuscando(true)
+    if (!busca.trim()) return
+    setBuscaErro(''); setResultados([]); setApenado(null); setBuscando(true)
     try {
       const res = await fetch('http://localhost:8000/api/v1/apenados/')
       const lista = await res.json()
-      const encontrado = lista.find(a => a.numero_execucao === numeroExecucao.trim())
-      if (!encontrado) throw new Error('Apenado não encontrado. Verifique o número da execução.')
-      setApenado(encontrado)
+      const termo = busca.trim().toLowerCase()
+      const encontrados = lista.filter(a =>
+        a.nome.toLowerCase().includes(termo) ||
+        a.numero_execucao.toLowerCase().includes(termo)
+      )
+      if (encontrados.length === 0) throw new Error('Nenhum apenado encontrado com esse nome ou número.')
+      if (encontrados.length === 1) {
+        setApenado(encontrados[0])
+      } else {
+        setResultados(encontrados)
+      }
     } catch (err) {
       setBuscaErro(err.message)
     } finally {
       setBuscando(false)
     }
+  }
+
+  const selecionarApenado = (a) => {
+    setApenado(a)
+    setResultados([])
+    setBusca(a.nome)
   }
 
   const handleChange = (e) => {
@@ -67,7 +83,6 @@ export default function ExecucaoPage() {
         detracao_inicio: form.detracao_inicio || null,
         detracao_fim: form.detracao_fim || null,
       }
-
       const resSalvar = await fetch('http://localhost:8000/api/v1/execucoes/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,44 +110,50 @@ export default function ExecucaoPage() {
   return (
     <div className={styles.root}>
       <div className={styles.bgPattern} />
-      <div className={styles.accentBar} />
-      <nav className={styles.nav}>
-        <div className={styles.logo} onClick={() => navigate('/home')}>
-          <div className={styles.logoIcon}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 1L9.5 6H14.5L10.5 9L12 14L8 11L4 14L5.5 9L1.5 6H6.5L8 1Z" fill="#c9a96e"/>
-            </svg>
-          </div>
-          <span className={styles.logoText}>CalPEC</span>
-        </div>
-        <span className={styles.navLink} onClick={() => navigate('/home')}>← Voltar</span>
-      </nav>
-
+      <Navbar showLinks />
       <div className={styles.body}>
         <div className={styles.container}>
           <h1 className={styles.title}>Registrar Execução Penal</h1>
           <div className={styles.divider} />
 
+          {/* Busca do apenado */}
           <div className={styles.buscaCard}>
             <p className={styles.sectionTitle}>Apenado</p>
             <div className={styles.buscaRow}>
               <input
                 className={styles.input}
-                placeholder="Número da execução (ex: 0001234-56.2024.8.18.0001)"
-                value={numeroExecucao}
-                onChange={e => setNumeroExecucao(e.target.value)}
+                placeholder="Buscar por nome ou número de execução..."
+                value={busca}
+                onChange={e => { setBusca(e.target.value); setApenado(null); setResultados([]) }}
                 onKeyDown={e => e.key === 'Enter' && buscarApenado()}
               />
               <button className={styles.btnBusca} onClick={buscarApenado} disabled={buscando} type="button">
                 {buscando ? '...' : 'Buscar'}
               </button>
             </div>
+
+            {/* Lista de resultados quando há mais de um */}
+            {resultados.length > 1 && (
+              <div className={styles.resultadoLista}>
+                <p className={styles.resultadoHint}>{resultados.length} apenados encontrados — selecione um:</p>
+                {resultados.map(a => (
+                  <div key={a.id} className={styles.resultadoItem} onClick={() => selecionarApenado(a)}>
+                    <span className={styles.resultadoNome}>{a.nome}</span>
+                    <span className={styles.resultadoNumero}>Nº {a.numero_execucao}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {buscaErro && <p className={styles.erro}>{buscaErro}</p>}
+
             {apenado && (
               <div className={styles.apenadoInfo}>
-                <span className={styles.apenadoBadge}>✓ Apenado encontrado</span>
+                <span className={styles.apenadoBadge}>✓ Selecionado</span>
                 <span className={styles.apenadoNome}>{apenado.nome}</span>
+                <span className={styles.apenadoDetalhe}>Nº {apenado.numero_execucao}</span>
                 <span className={styles.apenadoDetalhe}>Nascimento: {formatarData(apenado.data_nascimento)}</span>
+                <span className={styles.trocar} onClick={() => { setApenado(null); setBusca(''); setResultados([]) }}>Trocar</span>
               </div>
             )}
           </div>
@@ -183,7 +204,7 @@ export default function ExecucaoPage() {
                     <input className={styles.input} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} />
                   </div>
                 </div>
-                <p className={styles.sectionTitle} style={{marginTop: '20px'}}>Remição</p>
+                <p className={styles.sectionTitle} style={{marginTop: '20px'}}>Remição inicial</p>
                 <div className={styles.field}>
                   <label className={styles.label}>Dias trabalhados</label>
                   <input className={styles.input} type="number" name="dias_trabalhados" min="0" value={form.dias_trabalhados} onChange={handleChange} />
@@ -210,32 +231,12 @@ export default function ExecucaoPage() {
             <div className={styles.resultado}>
               <h2 className={styles.resultadoTitle}>✓ Execução salva e calculada</h2>
               <div className={styles.resultadoGrid}>
-                <div className={styles.resultadoCard}>
-                  <span className={styles.resultadoLabel}>Regime inicial</span>
-                  <span className={styles.resultadoValor}>{resultado.regime_inicial}</span>
-                </div>
-                <div className={styles.resultadoCard}>
-                  <span className={styles.resultadoLabel}>Dias remidos</span>
-                  <span className={styles.resultadoValor}>{resultado.dias_remidos}</span>
-                </div>
-                <div className={styles.resultadoCard}>
-                  <span className={styles.resultadoLabel}>Progressão para</span>
-                  <span className={styles.resultadoValor}>{resultado.regime_progressao}</span>
-                </div>
-                <div className={styles.resultadoCard}>
-                  <span className={styles.resultadoLabel}>Data de progressão</span>
-                  <span className={styles.resultadoValor}>{formatarData(resultado.data_progressao)}</span>
-                </div>
-                <div className={styles.resultadoCard}>
-                  <span className={styles.resultadoLabel}>Término da pena</span>
-                  <span className={styles.resultadoValor}>{formatarData(resultado.data_termino)}</span>
-                </div>
-                <div className={styles.resultadoCard}>
-                  <span className={styles.resultadoLabel}>Pena efetiva</span>
-                  <span className={styles.resultadoValor}>
-                    {resultado.pena_extenso?.anos}A {resultado.pena_extenso?.meses}M {resultado.pena_extenso?.dias}D
-                  </span>
-                </div>
+                <div className={styles.resultadoCard}><span className={styles.resultadoLabel}>Regime inicial</span><span className={styles.resultadoValor}>{resultado.regime_inicial}</span></div>
+                <div className={styles.resultadoCard}><span className={styles.resultadoLabel}>Dias remidos</span><span className={styles.resultadoValor}>{resultado.dias_remidos}</span></div>
+                <div className={styles.resultadoCard}><span className={styles.resultadoLabel}>Progressão para</span><span className={styles.resultadoValor}>{resultado.regime_progressao}</span></div>
+                <div className={styles.resultadoCard}><span className={styles.resultadoLabel}>Data de progressão</span><span className={styles.resultadoValor}>{formatarData(resultado.data_progressao)}</span></div>
+                <div className={styles.resultadoCard}><span className={styles.resultadoLabel}>Término da pena</span><span className={styles.resultadoValor}>{formatarData(resultado.data_termino)}</span></div>
+                <div className={styles.resultadoCard}><span className={styles.resultadoLabel}>Pena efetiva</span><span className={styles.resultadoValor}>{resultado.pena_extenso?.anos}A {resultado.pena_extenso?.meses}M {resultado.pena_extenso?.dias}D</span></div>
               </div>
             </div>
           )}

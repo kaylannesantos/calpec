@@ -17,10 +17,18 @@
 .btnBusca { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 8px; padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
 .btnBusca:hover { background: rgba(201,169,110,0.1); }
 .btnBusca:disabled { opacity: 0.5; cursor: not-allowed; }
+.resultadoLista { margin-top: 10px; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; }
+.resultadoHint { font-size: 11px; color: rgba(255,255,255,0.35); padding: 8px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.06); }
+.resultadoItem { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; transition: background 0.15s; }
+.resultadoItem:hover { background: rgba(201,169,110,0.08); }
+.resultadoNome { font-size: 13px; color: #e8dcc8; font-weight: 500; }
+.resultadoNumero { font-size: 11px; color: rgba(255,255,255,0.35); }
 .apenadoInfo { display: flex; align-items: center; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
 .apenadoBadge { font-size: 12px; color: #7ec88a; font-weight: 500; }
 .apenadoNome { font-size: 14px; color: #e8dcc8; font-weight: 500; }
 .apenadoDetalhe { font-size: 12px; color: rgba(255,255,255,0.4); }
+.trocar { font-size: 11px; color: rgba(255,255,255,0.3); cursor: pointer; margin-left: auto; transition: color 0.2s; }
+.trocar:hover { color: #c9a96e; }
 .form { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 32px; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px; }
 .section {}
@@ -29,7 +37,7 @@
 .row .field { flex: 1; }
 .field { margin-bottom: 14px; }
 .label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.07em; text-transform: uppercase; display: block; margin-bottom: 6px; }
-.input { width: 100%; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 9px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #e8dcc8; outline: none; transition: border-color 0.2s; }
+.input { width: 100%; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 9px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #e8dcc8; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
 .input::placeholder { color: rgba(255,255,255,0.2); }
 .input:focus { border-color: #c9a96e; }
 .input option { background: #1a2633; }
