@@ -266,7 +266,6 @@ export default function ExecucoesPage() {
                           className={styles.btnPDF}
                           onClick={() => handleGerarPDF(e)}
                           disabled={gerandoPDF === e.id}
-                          title="Gerar PDF"
                         >
                           {gerandoPDF === e.id ? '...' : '↓ PDF'}
                         </button>
