@@ -1,34 +1,25 @@
 .root { min-height: 100vh; background: #0f1923; display: flex; flex-direction: column; position: relative; }
 .bgPattern { position: fixed; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px); pointer-events: none; z-index: 0; }
-.accentBar { height: 2px; background: linear-gradient(90deg, transparent 0%, #c9a96e 40%, #c9a96e 60%, transparent 100%); position: relative; z-index: 2; }
-.nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 28px; border-bottom: 0.5px solid rgba(255,255,255,0.08); position: relative; z-index: 2; }
-.logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.logoIcon { width: 32px; height: 32px; border: 1.5px solid #c9a96e; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
-.logoText { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: #e8dcc8; }
-.navLink { font-size: 13px; color: rgba(255,255,255,0.45); cursor: pointer; letter-spacing: 0.04em; text-transform: uppercase; transition: color 0.2s; }
-.navLink:hover { color: #c9a96e; }
 .body { flex: 1; display: flex; justify-content: center; padding: 36px 24px; position: relative; z-index: 2; }
 .container { width: 100%; max-width: 800px; }
 .title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #e8dcc8; margin-bottom: 20px; }
 .divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 28px; }
 .buscaCard { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 24px 28px; margin-bottom: 20px; }
-.buscaRow { display: flex; gap: 12px; margin-bottom: 10px; }
-.buscaRow .input { flex: 1; }
-.btnBusca { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 8px; padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
-.btnBusca:hover { background: rgba(201,169,110,0.1); }
-.btnBusca:disabled { opacity: 0.5; cursor: not-allowed; }
-.resultadoLista { margin-top: 10px; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: hidden; }
-.resultadoHint { font-size: 11px; color: rgba(255,255,255,0.35); padding: 8px 14px; border-bottom: 0.5px solid rgba(255,255,255,0.06); }
-.resultadoItem { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; transition: background 0.15s; }
-.resultadoItem:hover { background: rgba(201,169,110,0.08); }
-.resultadoNome { font-size: 13px; color: #e8dcc8; font-weight: 500; }
-.resultadoNumero { font-size: 11px; color: rgba(255,255,255,0.35); }
-.apenadoInfo { display: flex; align-items: center; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+.buscaWrap { position: relative; }
+.inputSelecionado { border-color: #c9a96e !important; }
+.btnLimpar { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 14px; padding: 4px; transition: color 0.2s; }
+.btnLimpar:hover { color: #f08080; }
+.dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #1a2633; border: 0.5px solid rgba(255,255,255,0.12); border-radius: 10px; z-index: 100; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.4); max-height: 220px; overflow-y: auto; }
+.dropdownItem { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; cursor: pointer; transition: background 0.15s; border-bottom: 0.5px solid rgba(255,255,255,0.05); }
+.dropdownItem:last-child { border-bottom: none; }
+.dropdownItem:hover { background: rgba(201,169,110,0.1); }
+.dropdownNome { font-size: 13px; color: #e8dcc8; font-weight: 500; }
+.dropdownNumero { font-size: 11px; color: rgba(255,255,255,0.35); }
+.apenadoInfo { display: flex; align-items: center; gap: 14px; margin-top: 12px; flex-wrap: wrap; }
 .apenadoBadge { font-size: 12px; color: #7ec88a; font-weight: 500; }
 .apenadoNome { font-size: 14px; color: #e8dcc8; font-weight: 500; }
 .apenadoDetalhe { font-size: 12px; color: rgba(255,255,255,0.4); }
-.trocar { font-size: 11px; color: rgba(255,255,255,0.3); cursor: pointer; margin-left: auto; transition: color 0.2s; }
-.trocar:hover { color: #c9a96e; }
+.semResultado { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 8px; }
 .form { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 32px; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 24px; }
 .section {}

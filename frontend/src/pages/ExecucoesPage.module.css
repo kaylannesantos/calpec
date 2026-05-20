@@ -99,3 +99,7 @@
 .historicoRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .historicoDias { font-size: 13px; font-weight: 500; color: #7ec88a; }
 .historicoData { font-size: 11px; color: rgba(255,255,255,0.3); }
+.cardAcoes { display: flex; align-items: center; gap: 10px; }
+.btnPDF { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 7px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btnPDF:hover { background: rgba(201,169,110,0.1); }
+.btnPDF:disabled { opacity: 0.5; cursor: not-allowed; }

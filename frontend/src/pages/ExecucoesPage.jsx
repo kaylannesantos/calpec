@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import { gerarPDFExecucao } from '../utils/gerarPDF'
 import styles from './ExecucoesPage.module.css'
 
 const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Extinta']
@@ -114,7 +115,7 @@ function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
             </div>
             <div className={styles.remicaoField}>
               <label className={styles.remicaoLabel}>Observação (opcional)</label>
-              <input className={styles.remicaoInput} type="text" placeholder="Ex: Trabalho na oficina de marcenaria"
+              <input className={styles.remicaoInput} type="text" placeholder="Ex: Trabalho na oficina"
                 value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} />
             </div>
             {form.quantidade && (
@@ -163,6 +164,7 @@ export default function ExecucoesPage() {
   const [carregando, setCarregando] = useState(true)
   const [filtro, setFiltro] = useState(apenadoId || '')
   const [apenados, setApenados] = useState([])
+  const [gerandoPDF, setGerandoPDF] = useState(null)
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
@@ -185,9 +187,23 @@ export default function ExecucoesPage() {
     ? execucoes.filter(e => String(e.apenado_id) === String(filtro))
     : execucoes
 
-  const getNomeApenado = (id) => {
-    const a = apenados.find(a => a.id === id)
-    return a ? a.nome : `Apenado #${id}`
+  const getNomeApenado = (id) => apenados.find(a => a.id === id) || null
+
+  const handleGerarPDF = async (execucao) => {
+    setGerandoPDF(execucao.id)
+    try {
+      const apenado = getNomeApenado(execucao.apenado_id)
+      if (!apenado) return
+
+      const resRemicoes = await fetch(`http://localhost:8000/api/v1/remicoes/execucao/${execucao.id}`)
+      const remicoes = await resRemicoes.json()
+
+      gerarPDFExecucao({ apenado, execucao, remicoes })
+    } catch (err) {
+      console.error('Erro ao gerar PDF:', err)
+    } finally {
+      setGerandoPDF(null)
+    }
   }
 
   return (
@@ -236,7 +252,7 @@ export default function ExecucoesPage() {
                   <div key={e.id} className={styles.card}>
                     <div className={styles.cardTop}>
                       <div>
-                        <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)}</span>
+                        <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)?.nome || `Apenado #${e.apenado_id}`}</span>
                         <div className={styles.cardTags}>
                           <span className={`${styles.badge} ${progressaoVencida ? styles.badgeAlerta : styles.badgeFechado}`}>
                             {e.regime_progressao || 'Fechado'}
@@ -245,7 +261,17 @@ export default function ExecucoesPage() {
                           <span className={`${styles.badge} ${styles.badgeNatureza}`}>{e.natureza_crime}</span>
                         </div>
                       </div>
-                      <span className={styles.cardId}>#{e.id}</span>
+                      <div className={styles.cardAcoes}>
+                        <button
+                          className={styles.btnPDF}
+                          onClick={() => handleGerarPDF(e)}
+                          disabled={gerandoPDF === e.id}
+                          title="Gerar PDF"
+                        >
+                          {gerandoPDF === e.id ? '...' : '↓ PDF'}
+                        </button>
+                        <span className={styles.cardId}>#{e.id}</span>
+                      </div>
                     </div>
 
                     <div className={styles.etapas}>

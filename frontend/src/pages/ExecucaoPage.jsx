@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import styles from './ExecucaoPage.module.css'
@@ -16,10 +16,11 @@ const naturezas = [
 export default function ExecucaoPage() {
   const navigate = useNavigate()
   const [busca, setBusca] = useState('')
-  const [resultados, setResultados] = useState([])
+  const [todos, setTodos] = useState([])
+  const [sugestoes, setSugestoes] = useState([])
   const [apenado, setApenado] = useState(null)
-  const [buscaErro, setBuscaErro] = useState('')
-  const [buscando, setBuscando] = useState(false)
+  const [dropdownAberto, setDropdownAberto] = useState(false)
+  const buscaRef = useRef(null)
 
   const [form, setForm] = useState({
     pena_anos: 0, pena_meses: 0, pena_dias: 0,
@@ -31,34 +32,52 @@ export default function ExecucaoPage() {
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const buscarApenado = async () => {
-    if (!busca.trim()) return
-    setBuscaErro(''); setResultados([]); setApenado(null); setBuscando(true)
-    try {
-      const res = await fetch('http://localhost:8000/api/v1/apenados/')
-      const lista = await res.json()
-      const termo = busca.trim().toLowerCase()
-      const encontrados = lista.filter(a =>
-        a.nome.toLowerCase().includes(termo) ||
-        a.numero_execucao.toLowerCase().includes(termo)
-      )
-      if (encontrados.length === 0) throw new Error('Nenhum apenado encontrado com esse nome ou número.')
-      if (encontrados.length === 1) {
-        setApenado(encontrados[0])
-      } else {
-        setResultados(encontrados)
-      }
-    } catch (err) {
-      setBuscaErro(err.message)
-    } finally {
-      setBuscando(false)
+  // Carrega lista de apenados uma vez
+  useEffect(() => {
+    fetch('http://localhost:8000/api/v1/apenados/')
+      .then(r => r.json())
+      .then(setTodos)
+      .catch(() => {})
+  }, [])
+
+  // Filtra conforme digita
+  useEffect(() => {
+    if (!busca.trim() || apenado) {
+      setSugestoes([])
+      setDropdownAberto(false)
+      return
     }
-  }
+    const termo = busca.toLowerCase()
+    const filtrados = todos.filter(a =>
+      a.nome.toLowerCase().includes(termo) ||
+      a.numero_execucao.toLowerCase().includes(termo)
+    )
+    setSugestoes(filtrados)
+    setDropdownAberto(filtrados.length > 0)
+  }, [busca, todos, apenado])
+
+  // Fecha dropdown ao clicar fora
+  useEffect(() => {
+    const handler = (e) => {
+      if (buscaRef.current && !buscaRef.current.contains(e.target)) {
+        setDropdownAberto(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   const selecionarApenado = (a) => {
     setApenado(a)
-    setResultados([])
     setBusca(a.nome)
+    setSugestoes([])
+    setDropdownAberto(false)
+  }
+
+  const limparSelecao = () => {
+    setApenado(null)
+    setBusca('')
+    setSugestoes([])
   }
 
   const handleChange = (e) => {
@@ -68,7 +87,7 @@ export default function ExecucaoPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!apenado) { setErro('Busque e selecione um apenado antes de calcular.'); return }
+    if (!apenado) { setErro('Selecione um apenado antes de calcular.'); return }
     setErro(''); setResultado(null); setLoading(true)
     try {
       const payload = {
@@ -116,36 +135,32 @@ export default function ExecucaoPage() {
           <h1 className={styles.title}>Registrar Execução Penal</h1>
           <div className={styles.divider} />
 
-          {/* Busca do apenado */}
           <div className={styles.buscaCard}>
             <p className={styles.sectionTitle}>Apenado</p>
-            <div className={styles.buscaRow}>
+            <div className={styles.buscaWrap} ref={buscaRef}>
               <input
-                className={styles.input}
-                placeholder="Buscar por nome ou número de execução..."
+                className={`${styles.input} ${apenado ? styles.inputSelecionado : ''}`}
+                placeholder="Digite o nome ou número de execução..."
                 value={busca}
-                onChange={e => { setBusca(e.target.value); setApenado(null); setResultados([]) }}
-                onKeyDown={e => e.key === 'Enter' && buscarApenado()}
+                onChange={e => { setBusca(e.target.value); setApenado(null) }}
+                onFocus={() => sugestoes.length > 0 && setDropdownAberto(true)}
+                autoComplete="off"
               />
-              <button className={styles.btnBusca} onClick={buscarApenado} disabled={buscando} type="button">
-                {buscando ? '...' : 'Buscar'}
-              </button>
+              {apenado && (
+                <button className={styles.btnLimpar} onClick={limparSelecao} type="button">✕</button>
+              )}
+
+              {dropdownAberto && sugestoes.length > 0 && (
+                <div className={styles.dropdown}>
+                  {sugestoes.map(a => (
+                    <div key={a.id} className={styles.dropdownItem} onMouseDown={() => selecionarApenado(a)}>
+                      <span className={styles.dropdownNome}>{a.nome}</span>
+                      <span className={styles.dropdownNumero}>Nº {a.numero_execucao}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {/* Lista de resultados quando há mais de um */}
-            {resultados.length > 1 && (
-              <div className={styles.resultadoLista}>
-                <p className={styles.resultadoHint}>{resultados.length} apenados encontrados — selecione um:</p>
-                {resultados.map(a => (
-                  <div key={a.id} className={styles.resultadoItem} onClick={() => selecionarApenado(a)}>
-                    <span className={styles.resultadoNome}>{a.nome}</span>
-                    <span className={styles.resultadoNumero}>Nº {a.numero_execucao}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {buscaErro && <p className={styles.erro}>{buscaErro}</p>}
 
             {apenado && (
               <div className={styles.apenadoInfo}>
@@ -153,8 +168,11 @@ export default function ExecucaoPage() {
                 <span className={styles.apenadoNome}>{apenado.nome}</span>
                 <span className={styles.apenadoDetalhe}>Nº {apenado.numero_execucao}</span>
                 <span className={styles.apenadoDetalhe}>Nascimento: {formatarData(apenado.data_nascimento)}</span>
-                <span className={styles.trocar} onClick={() => { setApenado(null); setBusca(''); setResultados([]) }}>Trocar</span>
               </div>
+            )}
+
+            {!apenado && busca.length > 0 && sugestoes.length === 0 && (
+              <p className={styles.semResultado}>Nenhum apenado encontrado.</p>
             )}
           </div>
 
@@ -221,7 +239,6 @@ export default function ExecucaoPage() {
             </div>
 
             {erro && <p className={styles.erro}>{erro}</p>}
-
             <button className={styles.btn} type="submit" disabled={loading || !apenado}>
               {loading ? 'Calculando e salvando...' : 'Calcular e Salvar Execução Penal'}
             </button>
