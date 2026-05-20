@@ -21,14 +21,19 @@
 .cardTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
 .cardNome { font-size: 15px; font-weight: 500; color: #e8dcc8; display: block; margin-bottom: 8px; }
 .cardTags { display: flex; gap: 6px; flex-wrap: wrap; }
+.cardAcoes { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .cardId { font-size: 12px; color: rgba(255,255,255,0.2); }
 .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
 .badgeFechado { background: rgba(201,169,110,0.12); color: #c9a96e; }
 .badgeAlerta { background: rgba(255,209,102,0.12); color: #ffd166; }
 .badgeReincidente { background: rgba(240,128,128,0.1); color: #f08080; }
 .badgeNatureza { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
-
-/* Etapas */
+.btnPDF { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 7px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btnPDF:hover { background: rgba(201,169,110,0.1); }
+.btnPDF:disabled { opacity: 0.5; cursor: not-allowed; }
+.btnPDFDownload { background: #c9a96e; border: none; border-radius: 7px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #0f1923; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btnPDFDownload:hover { background: #d4b87a; }
+.btnPDFDownload:disabled { opacity: 0.5; cursor: not-allowed; }
 .etapas { display: flex; align-items: flex-start; margin-bottom: 18px; }
 .etapaGrupo { display: flex; align-items: center; flex: 1; }
 .etapaGrupo:last-child { flex: 0; }
@@ -40,8 +45,6 @@
 .etapaLabelAtiva { color: #c9a96e; }
 .etapaLinha { flex: 1; height: 1px; background: rgba(255,255,255,0.08); margin: 0 4px; margin-bottom: 16px; }
 .etapaLinhaFeita { background: #c9a96e; }
-
-/* Progresso */
 .progressoWrap { margin-bottom: 16px; }
 .progressoHeader { display: flex; justify-content: space-between; margin-bottom: 6px; }
 .progressoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
@@ -50,22 +53,14 @@
 .progressoBar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
 .progressoFill { height: 100%; border-radius: 3px; background: #c9a96e; transition: width 0.4s; }
 .progressoFillAlerta { background: #ffd166; }
-
-/* Grid de infos */
 .cardGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
 .cardInfo { display: flex; flex-direction: column; gap: 3px; }
 .infoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
 .infoValor { font-size: 13px; color: #e8dcc8; font-weight: 500; }
 .infoAlerta { color: #ffd166; }
-
-/* Alerta */
 .alertaBox { margin-top: 14px; font-size: 12px; color: #ffd166; background: rgba(255,209,102,0.06); border: 0.5px solid rgba(255,209,102,0.2); border-radius: 8px; padding: 8px 14px; }
-
-/* Vazio */
 .vazioBox { text-align: center; padding: 48px 24px; }
 .vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
-
-/* Remição */
 .remicaoWrap { margin-top: 16px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 14px; }
 .btnRemicao { background: transparent; border: 0.5px solid rgba(201,169,110,0.3); color: #c9a96e; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
 .btnRemicao:hover { background: rgba(201,169,110,0.08); }
@@ -99,7 +94,3 @@
 .historicoRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .historicoDias { font-size: 13px; font-weight: 500; color: #7ec88a; }
 .historicoData { font-size: 11px; color: rgba(255,255,255,0.3); }
-.cardAcoes { display: flex; align-items: center; gap: 10px; }
-.btnPDF { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 7px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-.btnPDF:hover { background: rgba(201,169,110,0.1); }
-.btnPDF:disabled { opacity: 0.5; cursor: not-allowed; }

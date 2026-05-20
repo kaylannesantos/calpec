@@ -189,16 +189,14 @@ export default function ExecucoesPage() {
 
   const getNomeApenado = (id) => apenados.find(a => a.id === id) || null
 
-  const handleGerarPDF = async (execucao) => {
+  const handleGerarPDF = async (execucao, visualizar = false) => {
     setGerandoPDF(execucao.id)
     try {
       const apenado = getNomeApenado(execucao.apenado_id)
       if (!apenado) return
-
       const resRemicoes = await fetch(`http://localhost:8000/api/v1/remicoes/execucao/${execucao.id}`)
       const remicoes = await resRemicoes.json()
-
-      gerarPDFExecucao({ apenado, execucao, remicoes })
+      gerarPDFExecucao({ apenado, execucao, remicoes, visualizar })
     } catch (err) {
       console.error('Erro ao gerar PDF:', err)
     } finally {
@@ -264,10 +262,19 @@ export default function ExecucoesPage() {
                       <div className={styles.cardAcoes}>
                         <button
                           className={styles.btnPDF}
-                          onClick={() => handleGerarPDF(e)}
+                          onClick={() => handleGerarPDF(e, true)}
                           disabled={gerandoPDF === e.id}
+                          title="Visualizar PDF"
                         >
-                          {gerandoPDF === e.id ? '...' : '↓ PDF'}
+                          {gerandoPDF === e.id ? '...' : '👁 Ver'}
+                        </button>
+                        <button
+                          className={styles.btnPDFDownload}
+                          onClick={() => handleGerarPDF(e, false)}
+                          disabled={gerandoPDF === e.id}
+                          title="Baixar PDF"
+                        >
+                          ↓ PDF
                         </button>
                         <span className={styles.cardId}>#{e.id}</span>
                       </div>

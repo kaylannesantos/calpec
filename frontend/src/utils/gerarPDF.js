@@ -12,13 +12,12 @@ function formatarDataHoje() {
   })
 }
 
-export function gerarPDFExecucao({ apenado, execucao, remicoes = [] }) {
+export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar = false }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210
   const margem = 20
   let y = 0
 
-  // Cores
   const dourado = [201, 169, 110]
   const escuro = [15, 25, 35]
   const cinza = [100, 110, 120]
@@ -28,12 +27,9 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [] }) {
   // ─── CABEÇALHO ───────────────────────────────────────
   doc.setFillColor(...escuro)
   doc.rect(0, 0, W, 40, 'F')
-
-  // Linha dourada topo
   doc.setFillColor(...dourado)
   doc.rect(0, 0, W, 1.5, 'F')
 
-  // Título
   doc.setTextColor(...dourado)
   doc.setFontSize(18)
   doc.setFont('helvetica', 'bold')
@@ -44,11 +40,9 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [] }) {
   doc.setFont('helvetica', 'normal')
   doc.text('SISTEMA ELETRÔNICO PARA CÁLCULO DO PROCESSO DE EXECUÇÃO CRIMINAL', margem, 22)
 
-  doc.setTextColor(...cinzaClaro)
   doc.setFontSize(7)
   doc.text(`Gerado em: ${formatarDataHoje()}`, margem, 28)
 
-  // Linha separadora dourada
   doc.setFillColor(...dourado)
   doc.rect(0, 38, W, 0.5, 'F')
 
@@ -180,7 +174,6 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [] }) {
     doc.rect(margem, y + 2, W - margem * 2, 0.3, 'F')
     y += 8
 
-    // Cabeçalho da tabela
     doc.setFillColor(240, 242, 245)
     doc.rect(margem, y, W - margem * 2, 7, 'F')
     doc.setTextColor(...cinza)
@@ -213,7 +206,6 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [] }) {
       y += 6
     })
 
-    // Total
     y += 2
     doc.setFillColor(...escuro)
     doc.rect(margem, y, W - margem * 2, 8, 'F')
@@ -238,7 +230,12 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [] }) {
   doc.text('CalPEC — Sistema Eletrônico para Cálculo do Processo de Execução Criminal', W / 2, alturaRodape + 7, { align: 'center' })
   doc.text('Conforme Lei de Execução Penal (LEP — Lei nº 7.210/1984) e Pacote Anticrime (Lei nº 13.964/2019)', W / 2, alturaRodape + 12, { align: 'center' })
 
-  // ─── SALVAR ──────────────────────────────────────────
-  const nomeArquivo = `CalPEC_${apenado.nome.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
-  doc.save(nomeArquivo)
+  // ─── VISUALIZAR OU BAIXAR ────────────────────────────
+  if (visualizar) {
+    const url = doc.output('bloburl')
+    window.open(url, '_blank')
+  } else {
+    const nomeArquivo = `CalPEC_${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
+    doc.save(nomeArquivo)
+  }
 }
