@@ -235,7 +235,7 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
     const url = doc.output('bloburl')
     window.open(url, '_blank')
   } else {
-    const nomeArquivo = `CalPEC_${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
+    const nomeArquivo = `${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
     doc.save(nomeArquivo)
   }
 }
