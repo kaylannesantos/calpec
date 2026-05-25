@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage'
 import ApenadoPage from './pages/ApenadoPage'
 import ExecucaoPage from './pages/ExecucaoPage'
 import ExecucoesPage from './pages/ExecucoesPage'
+import PerfilPage from './pages/PerfilPage'
 
 function App() {
   return (
@@ -14,11 +15,11 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registrar" element={<RegisterPage />} />
-
         <Route path="/home" element={<RotaProtegida><HomePage /></RotaProtegida>} />
         <Route path="/apenados" element={<RotaProtegida><ApenadoPage /></RotaProtegida>} />
         <Route path="/execucao" element={<RotaProtegida><ExecucaoPage /></RotaProtegida>} />
         <Route path="/execucoes" element={<RotaProtegida><ExecucoesPage /></RotaProtegida>} />
+        <Route path="/perfil" element={<RotaProtegida><PerfilPage /></RotaProtegida>} />
       </Routes>
     </BrowserRouter>
   )

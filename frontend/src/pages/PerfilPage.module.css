@@ -1,0 +1,37 @@
+.root { min-height: 100vh; background: #0f1923; display: flex; flex-direction: column; position: relative; }
+.bgPattern { position: fixed; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px), repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.025) 39px, rgba(255,255,255,0.025) 40px); pointer-events: none; z-index: 0; }
+.body { flex: 1; display: flex; justify-content: center; padding: 36px 24px; position: relative; z-index: 2; }
+.container { width: 100%; max-width: 800px; }
+.pageHeader { margin-bottom: 20px; }
+.title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #e8dcc8; }
+.divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 28px; }
+.dividerLight { height: 0.5px; background: rgba(255,255,255,0.05); margin: 16px 0; }
+.grid { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
+.infoCard { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 28px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; height: fit-content; }
+.avatar { width: 72px; height: 72px; border-radius: 50%; background: rgba(201,169,110,0.15); border: 1.5px solid #c9a96e; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.avatarLetra { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 600; color: #c9a96e; }
+.infoNome { font-size: 15px; font-weight: 500; color: #e8dcc8; }
+.infoEmail { font-size: 12px; color: rgba(255,255,255,0.4); }
+.infoBadge { font-size: 11px; background: rgba(201,169,110,0.1); border: 0.5px solid rgba(201,169,110,0.3); color: #c9a96e; border-radius: 20px; padding: 3px 12px; }
+.infoDetalhe { font-size: 11px; color: rgba(255,255,255,0.3); }
+.formCard { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 28px 32px; }
+.sectionLabel { font-size: 11px; color: #c9a96e; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; margin-bottom: 14px; }
+.senhaHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.senhaHeader .sectionLabel { margin-bottom: 0; }
+.btnToggleSenha { background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 6px; padding: 4px 12px; font-family: 'DM Sans', sans-serif; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+.btnToggleSenha:hover { border-color: #c9a96e; color: #c9a96e; }
+.row { display: flex; gap: 14px; }
+.row .field { flex: 1; }
+.field { margin-bottom: 14px; }
+.label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.07em; text-transform: uppercase; display: block; margin-bottom: 6px; }
+.input { width: 100%; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #e8dcc8; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
+.input::placeholder { color: rgba(255,255,255,0.2); }
+.input:focus { border-color: #c9a96e; }
+.input:disabled { opacity: 0.4; cursor: not-allowed; }
+.erro { font-size: 13px; color: #f08080; margin-bottom: 12px; }
+.sucesso { font-size: 13px; color: #7ec88a; margin-bottom: 12px; }
+.btn { width: 100%; margin-top: 8px; background: #c9a96e; border: none; border-radius: 8px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: #0f1923; cursor: pointer; transition: background 0.2s; }
+.btn:hover { background: #d4b87a; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btnSair { width: 100%; margin-top: 16px; background: transparent; border: 0.5px solid rgba(240,128,128,0.3); color: #f08080; border-radius: 8px; padding: 9px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btnSair:hover { background: rgba(240,128,128,0.08); border-color: #f08080; }

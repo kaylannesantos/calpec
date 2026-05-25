@@ -6,13 +6,9 @@ export default function Navbar({ showLinks = false }) {
   const navigate = useNavigate()
   const location = useLocation()
 
-  const handleLogout = () => {
-    localStorage.clear()
-    navigate('/login')
-  }
-
   const isLogin = location.pathname === '/login'
   const isRegistrar = location.pathname === '/registrar'
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
   return (
     <nav className={styles.nav}>
@@ -30,8 +26,14 @@ export default function Navbar({ showLinks = false }) {
             <>
               <span className={`${styles.link} ${location.pathname === '/apenados' ? styles.active : ''}`} onClick={() => navigate('/apenados')}>Apenados</span>
               <span className={`${styles.link} ${location.pathname === '/execucoes' ? styles.active : ''}`} onClick={() => navigate('/execucoes')}>Execuções</span>
-              <span className={`${styles.link} ${location.pathname === '/execucao' ? styles.active : ''}`} onClick={() => navigate('/execucao')}>+ Nova</span>
-              <span className={styles.linkLogout} onClick={handleLogout}>Sair</span>
+              <div className={styles.perfilWrap} onClick={() => navigate('/perfil')}>
+                <div className={styles.perfilAvatar}>
+                  {user.nome?.charAt(0).toUpperCase()}
+                </div>
+                <span className={`${styles.link} ${location.pathname === '/perfil' ? styles.active : ''}`}>
+                  {user.nome?.split(' ')[0]}
+                </span>
+              </div>
             </>
           )}
           {!isLogin && !isRegistrar && !showLinks && (
