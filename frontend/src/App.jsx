@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage'
 import ApenadoPage from './pages/ApenadoPage'
 import ExecucaoPage from './pages/ExecucaoPage'
 import ExecucoesPage from './pages/ExecucoesPage'
+import EditarExecucaoPage from './pages/EditarExecucaoPage'
 import PerfilPage from './pages/PerfilPage'
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/apenados" element={<RotaProtegida><ApenadoPage /></RotaProtegida>} />
         <Route path="/execucao" element={<RotaProtegida><ExecucaoPage /></RotaProtegida>} />
         <Route path="/execucoes" element={<RotaProtegida><ExecucoesPage /></RotaProtegida>} />
+        <Route path="/execucoes/:id/editar" element={<RotaProtegida><EditarExecucaoPage /></RotaProtegida>} />
         <Route path="/perfil" element={<RotaProtegida><PerfilPage /></RotaProtegida>} />
       </Routes>
     </BrowserRouter>

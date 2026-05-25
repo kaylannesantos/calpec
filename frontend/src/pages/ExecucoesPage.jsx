@@ -5,6 +5,15 @@ import { gerarPDFExecucao } from '../utils/gerarPDF'
 import styles from './ExecucoesPage.module.css'
 
 const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Extinta']
+const naturezas = [
+  { value: 'comum', label: 'Crime comum (sem violência)' },
+  { value: 'violento', label: 'Crime comum (com violência)' },
+  { value: 'hediondo', label: 'Crime hediondo' },
+  { value: 'hediondo_morte', label: 'Crime hediondo com resultado morte' },
+  { value: 'feminicidio', label: 'Feminicídio' },
+  { value: 'milicia', label: 'Constituição de milícia privada' },
+  { value: 'org_criminosa', label: 'Organização criminosa' },
+]
 
 function getEtapaIndex(regime) {
   if (!regime) return 0
@@ -29,6 +38,149 @@ function calcularDiasFaltantes(dataProgressao) {
   const hoje = new Date()
   const prog = new Date(dataProgressao + 'T12:00:00')
   return Math.ceil((prog - hoje) / (1000 * 60 * 60 * 24))
+}
+
+function CardEdicao({ execucao, onAtualizado }) {
+  const [aberto, setAberto] = useState(false)
+  const [form, setForm] = useState({
+    pena_anos: execucao.pena_anos,
+    pena_meses: execucao.pena_meses,
+    pena_dias: execucao.pena_dias,
+    natureza_crime: execucao.natureza_crime,
+    reincidente: execucao.reincidente,
+    data_inicio_pena: execucao.data_inicio_pena,
+    detracao_inicio: execucao.detracao_inicio || '',
+    detracao_fim: execucao.detracao_fim || '',
+    dias_trabalhados: execucao.dias_trabalhados || 0,
+    horas_estudo: execucao.horas_estudo || 0,
+    obras_lidas: execucao.obras_lidas || 0,
+  })
+  const [loading, setLoading] = useState(false)
+  const [erro, setErro] = useState('')
+  const [sucesso, setSucesso] = useState('')
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setErro(''); setSucesso(''); setLoading(true)
+    try {
+      const payload = {
+        ...form,
+        apenado_id: execucao.apenado_id,
+        pena_anos: parseInt(form.pena_anos) || 0,
+        pena_meses: parseInt(form.pena_meses) || 0,
+        pena_dias: parseInt(form.pena_dias) || 0,
+        dias_trabalhados: parseInt(form.dias_trabalhados) || 0,
+        horas_estudo: parseInt(form.horas_estudo) || 0,
+        obras_lidas: parseInt(form.obras_lidas) || 0,
+        detracao_inicio: form.detracao_inicio || null,
+        detracao_fim: form.detracao_fim || null,
+      }
+      const res = await fetch(`http://localhost:8000/api/v1/execucoes/${execucao.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || 'Erro ao atualizar')
+      setSucesso('Execução atualizada com sucesso!')
+      onAtualizado()
+      setTimeout(() => { setSucesso(''); setAberto(false) }, 1500)
+    } catch (err) {
+      setErro(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className={styles.edicaoWrap}>
+      <button className={styles.btnEditar} onClick={() => { setAberto(!aberto); setErro(''); setSucesso('') }} type="button">
+        {aberto ? '▲ Fechar edição' : '✎ Editar execução'}
+      </button>
+
+      {aberto && (
+        <form onSubmit={handleSubmit} className={styles.edicaoForm}>
+          <p className={styles.edicaoTitulo}>Editar dados da execução</p>
+
+          <div className={styles.edicaoGrid}>
+            <div className={styles.edicaoSection}>
+              <p className={styles.edicaoSectionLabel}>Pena</p>
+              <div className={styles.edicaoRow}>
+                <div className={styles.edicaoField}>
+                  <label className={styles.remicaoLabel}>Anos</label>
+                  <input className={styles.remicaoInput} type="number" name="pena_anos" min="0" value={form.pena_anos} onChange={handleChange} />
+                </div>
+                <div className={styles.edicaoField}>
+                  <label className={styles.remicaoLabel}>Meses</label>
+                  <input className={styles.remicaoInput} type="number" name="pena_meses" min="0" max="11" value={form.pena_meses} onChange={handleChange} />
+                </div>
+                <div className={styles.edicaoField}>
+                  <label className={styles.remicaoLabel}>Dias</label>
+                  <input className={styles.remicaoInput} type="number" name="pena_dias" min="0" max="29" value={form.pena_dias} onChange={handleChange} />
+                </div>
+              </div>
+
+              <div className={styles.edicaoField}>
+                <label className={styles.remicaoLabel}>Natureza do crime</label>
+                <select className={styles.remicaoInput} name="natureza_crime" value={form.natureza_crime} onChange={handleChange}>
+                  {naturezas.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
+                </select>
+              </div>
+
+              <div className={styles.edicaoCheck}>
+                <input type="checkbox" id={`reincidente_${execucao.id}`} name="reincidente" checked={form.reincidente} onChange={handleChange} />
+                <label htmlFor={`reincidente_${execucao.id}`} className={styles.remicaoLabel}>Réu reincidente</label>
+              </div>
+
+              <div className={styles.edicaoField}>
+                <label className={styles.remicaoLabel}>Início da pena</label>
+                <input className={styles.remicaoInput} type="date" name="data_inicio_pena" value={form.data_inicio_pena} onChange={handleChange} required />
+              </div>
+            </div>
+
+            <div className={styles.edicaoSection}>
+              <p className={styles.edicaoSectionLabel}>Detração</p>
+              <div className={styles.edicaoRow}>
+                <div className={styles.edicaoField}>
+                  <label className={styles.remicaoLabel}>Início</label>
+                  <input className={styles.remicaoInput} type="date" name="detracao_inicio" value={form.detracao_inicio} onChange={handleChange} />
+                </div>
+                <div className={styles.edicaoField}>
+                  <label className={styles.remicaoLabel}>Fim</label>
+                  <input className={styles.remicaoInput} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} />
+                </div>
+              </div>
+
+              <p className={styles.edicaoSectionLabel} style={{marginTop: '12px'}}>Remição inicial</p>
+              <div className={styles.edicaoField}>
+                <label className={styles.remicaoLabel}>Dias trabalhados</label>
+                <input className={styles.remicaoInput} type="number" name="dias_trabalhados" min="0" value={form.dias_trabalhados} onChange={handleChange} />
+              </div>
+              <div className={styles.edicaoField}>
+                <label className={styles.remicaoLabel}>Horas de estudo</label>
+                <input className={styles.remicaoInput} type="number" name="horas_estudo" min="0" value={form.horas_estudo} onChange={handleChange} />
+              </div>
+              <div className={styles.edicaoField}>
+                <label className={styles.remicaoLabel}>Obras lidas</label>
+                <input className={styles.remicaoInput} type="number" name="obras_lidas" min="0" max="12" value={form.obras_lidas} onChange={handleChange} />
+              </div>
+            </div>
+          </div>
+
+          {erro && <p className={styles.remicaoErro}>{erro}</p>}
+          {sucesso && <p className={styles.remicaoSucesso}>{sucesso}</p>}
+          <button className={styles.btnSalvarEdicao} type="submit" disabled={loading}>
+            {loading ? 'Salvando...' : 'Salvar alterações'}
+          </button>
+        </form>
+      )}
+    </div>
+  )
 }
 
 function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
@@ -260,20 +412,10 @@ export default function ExecucoesPage() {
                         </div>
                       </div>
                       <div className={styles.cardAcoes}>
-                        <button
-                          className={styles.btnPDF}
-                          onClick={() => handleGerarPDF(e, true)}
-                          disabled={gerandoPDF === e.id}
-                          title="Visualizar PDF"
-                        >
+                        <button className={styles.btnPDF} onClick={() => handleGerarPDF(e, true)} disabled={gerandoPDF === e.id} title="Visualizar PDF">
                           {gerandoPDF === e.id ? '...' : '👁 Ver'}
                         </button>
-                        <button
-                          className={styles.btnPDFDownload}
-                          onClick={() => handleGerarPDF(e, false)}
-                          disabled={gerandoPDF === e.id}
-                          title="Baixar PDF"
-                        >
+                        <button className={styles.btnPDFDownload} onClick={() => handleGerarPDF(e, false)} disabled={gerandoPDF === e.id} title="Baixar PDF">
                           ↓ PDF
                         </button>
                         <span className={styles.cardId}>#{e.id}</span>
@@ -318,7 +460,10 @@ export default function ExecucoesPage() {
 
                     {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
 
-                    <CardRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />
+                    <div className={styles.acoesCard}>
+                      <CardEdicao execucao={e} onAtualizado={carregar} />
+                      <CardRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />
+                    </div>
                   </div>
                 )
               })}
