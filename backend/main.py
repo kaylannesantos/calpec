@@ -1,11 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.endpoints import auth, apenados, advogados, execucoes, remicoes
-from app.db.database import engine, Base
-from app.models import user, apenado, execucao, remicao
-
-# Criar tabelas automaticamente ao iniciar
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="CalPEC API",
@@ -30,3 +25,13 @@ app.include_router(remicoes.router, prefix="/api/v1/remicoes", tags=["Remições
 @app.get("/")
 def root():
     return {"message": "CalPEC API está online"}
+
+@app.on_event("startup")
+async def startup():
+    try:
+        from app.db.database import engine, Base
+        from app.models import user, apenado, execucao, remicao
+        Base.metadata.create_all(bind=engine)
+        print("Tabelas criadas com sucesso!")
+    except Exception as e:
+        print(f"Erro ao criar tabelas: {e}")
