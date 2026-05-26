@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import Logo from '../components/ui/Logo'
 import styles from './LoginPage.module.css'
+import { API_URL } from '../services/api'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -16,7 +17,7 @@ export default function LoginPage() {
     e.preventDefault()
     setErro(''); setLoading(true)
     try {
-      const res = await fetch('http://localhost:8000/api/v1/auth/login', {
+      const res = await fetch(`${API_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
