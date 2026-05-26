@@ -397,7 +397,7 @@ export default function ExecucoesPage() {
                 const pct = calcularProgresso(e)
                 const diasFaltantes = calcularDiasFaltantes(e.data_progressao)
                 const progressaoVencida = diasFaltantes !== null && diasFaltantes < 0
-                const etapaAtual = getEtapaIndex(e.regime_progressao)
+                const etapaAtual = getEtapaIndex(e.regime_inicial)
 
                 return (
                   <div key={e.id} className={styles.card}>
