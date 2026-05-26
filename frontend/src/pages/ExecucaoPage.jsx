@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
+import { API_URL } from '../services/api'
 import styles from './ExecucaoPage.module.css'
 
 const naturezas = [
@@ -32,54 +33,27 @@ export default function ExecucaoPage() {
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Carrega lista de apenados uma vez
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/apenados/')
-      .then(r => r.json())
-      .then(setTodos)
-      .catch(() => {})
+    fetch(`${API_URL}/api/v1/apenados/`)
+      .then(r => r.json()).then(setTodos).catch(() => {})
   }, [])
 
-  // Filtra conforme digita
   useEffect(() => {
-    if (!busca.trim() || apenado) {
-      setSugestoes([])
-      setDropdownAberto(false)
-      return
-    }
+    if (!busca.trim() || apenado) { setSugestoes([]); setDropdownAberto(false); return }
     const termo = busca.toLowerCase()
-    const filtrados = todos.filter(a =>
-      a.nome.toLowerCase().includes(termo) ||
-      a.numero_execucao.toLowerCase().includes(termo)
-    )
+    const filtrados = todos.filter(a => a.nome.toLowerCase().includes(termo) || a.numero_execucao.toLowerCase().includes(termo))
     setSugestoes(filtrados)
     setDropdownAberto(filtrados.length > 0)
   }, [busca, todos, apenado])
 
-  // Fecha dropdown ao clicar fora
   useEffect(() => {
-    const handler = (e) => {
-      if (buscaRef.current && !buscaRef.current.contains(e.target)) {
-        setDropdownAberto(false)
-      }
-    }
+    const handler = (e) => { if (buscaRef.current && !buscaRef.current.contains(e.target)) setDropdownAberto(false) }
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const selecionarApenado = (a) => {
-    setApenado(a)
-    setBusca(a.nome)
-    setSugestoes([])
-    setDropdownAberto(false)
-  }
-
-  const limparSelecao = () => {
-    setApenado(null)
-    setBusca('')
-    setSugestoes([])
-  }
-
+  const selecionarApenado = (a) => { setApenado(a); setBusca(a.nome); setSugestoes([]); setDropdownAberto(false) }
+  const limparSelecao = () => { setApenado(null); setBusca(''); setSugestoes([]) }
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setForm({ ...form, [name]: type === 'checkbox' ? checked : value })
@@ -91,37 +65,23 @@ export default function ExecucaoPage() {
     setErro(''); setResultado(null); setLoading(true)
     try {
       const payload = {
-        ...form,
-        apenado_id: apenado.id,
-        pena_anos: parseInt(form.pena_anos) || 0,
-        pena_meses: parseInt(form.pena_meses) || 0,
-        pena_dias: parseInt(form.pena_dias) || 0,
-        dias_trabalhados: parseInt(form.dias_trabalhados) || 0,
-        horas_estudo: parseInt(form.horas_estudo) || 0,
-        obras_lidas: parseInt(form.obras_lidas) || 0,
-        detracao_inicio: form.detracao_inicio || null,
-        detracao_fim: form.detracao_fim || null,
+        ...form, apenado_id: apenado.id,
+        pena_anos: parseInt(form.pena_anos) || 0, pena_meses: parseInt(form.pena_meses) || 0,
+        pena_dias: parseInt(form.pena_dias) || 0, dias_trabalhados: parseInt(form.dias_trabalhados) || 0,
+        horas_estudo: parseInt(form.horas_estudo) || 0, obras_lidas: parseInt(form.obras_lidas) || 0,
+        detracao_inicio: form.detracao_inicio || null, detracao_fim: form.detracao_fim || null,
       }
-      const resSalvar = await fetch('http://localhost:8000/api/v1/execucoes/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const resSalvar = await fetch(`${API_URL}/api/v1/execucoes/`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       })
       const dadosSalvos = await resSalvar.json()
       if (!resSalvar.ok) throw new Error(JSON.stringify(dadosSalvos.detail) || 'Erro ao salvar')
-
-      const resCalculo = await fetch('http://localhost:8000/api/v1/execucoes/calcular', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+      const resCalculo = await fetch(`${API_URL}/api/v1/execucoes/calcular`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       })
       const dadosCalculo = await resCalculo.json()
       setResultado(dadosCalculo)
-    } catch (err) {
-      setErro(err.message)
-    } finally {
-      setLoading(false)
-    }
+    } catch (err) { setErro(err.message) } finally { setLoading(false) }
   }
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
@@ -134,22 +94,14 @@ export default function ExecucaoPage() {
         <div className={styles.container}>
           <h1 className={styles.title}>Registrar Execução Penal</h1>
           <div className={styles.divider} />
-
           <div className={styles.buscaCard}>
             <p className={styles.sectionTitle}>Apenado</p>
             <div className={styles.buscaWrap} ref={buscaRef}>
-              <input
-                className={`${styles.input} ${apenado ? styles.inputSelecionado : ''}`}
+              <input className={`${styles.input} ${apenado ? styles.inputSelecionado : ''}`}
                 placeholder="Digite o nome ou número de execução..."
-                value={busca}
-                onChange={e => { setBusca(e.target.value); setApenado(null) }}
-                onFocus={() => sugestoes.length > 0 && setDropdownAberto(true)}
-                autoComplete="off"
-              />
-              {apenado && (
-                <button className={styles.btnLimpar} onClick={limparSelecao} type="button">✕</button>
-              )}
-
+                value={busca} onChange={e => { setBusca(e.target.value); setApenado(null) }}
+                onFocus={() => sugestoes.length > 0 && setDropdownAberto(true)} autoComplete="off" />
+              {apenado && <button className={styles.btnLimpar} onClick={limparSelecao} type="button">✕</button>}
               {dropdownAberto && sugestoes.length > 0 && (
                 <div className={styles.dropdown}>
                   {sugestoes.map(a => (
@@ -161,7 +113,6 @@ export default function ExecucaoPage() {
                 </div>
               )}
             </div>
-
             {apenado && (
               <div className={styles.apenadoInfo}>
                 <span className={styles.apenadoBadge}>✓ Selecionado</span>
@@ -170,10 +121,7 @@ export default function ExecucaoPage() {
                 <span className={styles.apenadoDetalhe}>Nascimento: {formatarData(apenado.data_nascimento)}</span>
               </div>
             )}
-
-            {!apenado && busca.length > 0 && sugestoes.length === 0 && (
-              <p className={styles.semResultado}>Nenhum apenado encontrado.</p>
-            )}
+            {!apenado && busca.length > 0 && sugestoes.length === 0 && <p className={styles.semResultado}>Nenhum apenado encontrado.</p>}
           </div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
@@ -181,18 +129,9 @@ export default function ExecucaoPage() {
               <div className={styles.section}>
                 <p className={styles.sectionTitle}>Dados da Pena</p>
                 <div className={styles.row}>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Anos</label>
-                    <input className={styles.input} type="number" name="pena_anos" min="0" value={form.pena_anos} onChange={handleChange} />
-                  </div>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Meses</label>
-                    <input className={styles.input} type="number" name="pena_meses" min="0" max="11" value={form.pena_meses} onChange={handleChange} />
-                  </div>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Dias</label>
-                    <input className={styles.input} type="number" name="pena_dias" min="0" max="29" value={form.pena_dias} onChange={handleChange} />
-                  </div>
+                  <div className={styles.field}><label className={styles.label}>Anos</label><input className={styles.input} type="number" name="pena_anos" min="0" value={form.pena_anos} onChange={handleChange} /></div>
+                  <div className={styles.field}><label className={styles.label}>Meses</label><input className={styles.input} type="number" name="pena_meses" min="0" max="11" value={form.pena_meses} onChange={handleChange} /></div>
+                  <div className={styles.field}><label className={styles.label}>Dias</label><input className={styles.input} type="number" name="pena_dias" min="0" max="29" value={form.pena_dias} onChange={handleChange} /></div>
                 </div>
                 <div className={styles.field}>
                   <label className={styles.label}>Natureza do crime</label>
@@ -204,40 +143,20 @@ export default function ExecucaoPage() {
                   <input type="checkbox" id="reincidente" name="reincidente" checked={form.reincidente} onChange={handleChange} />
                   <label htmlFor="reincidente" className={styles.checkLabel}>Réu reincidente</label>
                 </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Início da pena</label>
-                  <input className={styles.input} type="date" name="data_inicio_pena" value={form.data_inicio_pena} onChange={handleChange} required />
-                </div>
+                <div className={styles.field}><label className={styles.label}>Início da pena</label><input className={styles.input} type="date" name="data_inicio_pena" value={form.data_inicio_pena} onChange={handleChange} required /></div>
               </div>
-
               <div className={styles.section}>
                 <p className={styles.sectionTitle}>Detração</p>
                 <div className={styles.row}>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Início</label>
-                    <input className={styles.input} type="date" name="detracao_inicio" value={form.detracao_inicio} onChange={handleChange} />
-                  </div>
-                  <div className={styles.field}>
-                    <label className={styles.label}>Fim</label>
-                    <input className={styles.input} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} />
-                  </div>
+                  <div className={styles.field}><label className={styles.label}>Início</label><input className={styles.input} type="date" name="detracao_inicio" value={form.detracao_inicio} onChange={handleChange} /></div>
+                  <div className={styles.field}><label className={styles.label}>Fim</label><input className={styles.input} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} /></div>
                 </div>
                 <p className={styles.sectionTitle} style={{marginTop: '20px'}}>Remição inicial</p>
-                <div className={styles.field}>
-                  <label className={styles.label}>Dias trabalhados</label>
-                  <input className={styles.input} type="number" name="dias_trabalhados" min="0" value={form.dias_trabalhados} onChange={handleChange} />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Horas de estudo</label>
-                  <input className={styles.input} type="number" name="horas_estudo" min="0" value={form.horas_estudo} onChange={handleChange} />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Obras lidas</label>
-                  <input className={styles.input} type="number" name="obras_lidas" min="0" max="12" value={form.obras_lidas} onChange={handleChange} />
-                </div>
+                <div className={styles.field}><label className={styles.label}>Dias trabalhados</label><input className={styles.input} type="number" name="dias_trabalhados" min="0" value={form.dias_trabalhados} onChange={handleChange} /></div>
+                <div className={styles.field}><label className={styles.label}>Horas de estudo</label><input className={styles.input} type="number" name="horas_estudo" min="0" value={form.horas_estudo} onChange={handleChange} /></div>
+                <div className={styles.field}><label className={styles.label}>Obras lidas</label><input className={styles.input} type="number" name="obras_lidas" min="0" max="12" value={form.obras_lidas} onChange={handleChange} /></div>
               </div>
             </div>
-
             {erro && <p className={styles.erro}>{erro}</p>}
             <button className={styles.btn} type="submit" disabled={loading || !apenado}>
               {loading ? 'Calculando e salvando...' : 'Calcular e Salvar Execução Penal'}

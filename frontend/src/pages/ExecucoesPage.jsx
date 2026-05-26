@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import { gerarPDFExecucao } from '../utils/gerarPDF'
 import styles from './ExecucoesPage.module.css'
+import { API_URL } from '../services/api'
 
 const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Extinta']
 const naturezas = [
@@ -80,7 +81,7 @@ function CardEdicao({ execucao, onAtualizado }) {
         detracao_inicio: form.detracao_inicio || null,
         detracao_fim: form.detracao_fim || null,
       }
-      const res = await fetch(`http://localhost:8000/api/v1/execucoes/${execucao.id}`, {
+      const res = await fetch(`${API_URL}/api/v1/execucoes/${execucao.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -200,7 +201,7 @@ function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
 
   const carregarHistorico = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/v1/remicoes/execucao/${execucaoId}`)
+      const res = await fetch(`${API_URL}/api/v1/remicoes/execucao/${execucaoId}`)
       setHistorico(await res.json())
     } catch {}
   }
@@ -215,7 +216,7 @@ function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
     e.preventDefault()
     setErro(''); setSucesso(''); setLoading(true)
     try {
-      const res = await fetch('http://localhost:8000/api/v1/remicoes/', {
+      const res = await fetch('${API_URL}/api/v1/remicoes/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, execucao_id: execucaoId, quantidade: parseInt(form.quantidade) }),
@@ -324,8 +325,8 @@ export default function ExecucoesPage() {
     setCarregando(true)
     try {
       const [resExec, resApen] = await Promise.all([
-        fetch('http://localhost:8000/api/v1/execucoes/'),
-        fetch('http://localhost:8000/api/v1/apenados/'),
+        fetch('${API_URL}/api/v1/execucoes/'),
+        fetch('${API_URL}/api/v1/apenados/'),
       ])
       setExecucoes(await resExec.json())
       setApenados(await resApen.json())
@@ -346,7 +347,7 @@ export default function ExecucoesPage() {
     try {
       const apenado = getNomeApenado(execucao.apenado_id)
       if (!apenado) return
-      const resRemicoes = await fetch(`http://localhost:8000/api/v1/remicoes/execucao/${execucao.id}`)
+      const resRemicoes = await fetch(`${API_URL}/api/v1/remicoes/execucao/${execucao.id}`)
       const remicoes = await resRemicoes.json()
       gerarPDFExecucao({ apenado, execucao, remicoes, visualizar })
     } catch (err) {
