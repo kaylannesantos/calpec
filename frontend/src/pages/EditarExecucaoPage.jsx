@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import styles from './ExecucaoPage.module.css'
+import { API_URL } from '../services/api'
 
 const naturezas = [
   { value: 'comum', label: 'Crime comum (sem violência)' },
@@ -27,11 +28,11 @@ export default function EditarExecucaoPage() {
   useEffect(() => {
     const carregar = async () => {
       try {
-        const resExec = await fetch(`http://localhost:8000/api/v1/execucoes/${id}`)
+        const resExec = await fetch(`${API_URL}/api/v1/execucoes/${id}`)
         if (!resExec.ok) throw new Error('Execução não encontrada')
         const exec = await resExec.json()
 
-        const resApen = await fetch(`http://localhost:8000/api/v1/apenados/${exec.apenado_id}`)
+        const resApen = await fetch(`${API_URL}/api/v1/apenados/${exec.apenado_id}`)
         const apen = await resApen.json()
         setApenado(apen)
 
@@ -83,7 +84,7 @@ export default function EditarExecucaoPage() {
         unificacao_fim: form.unificacao_fim || null,
       }
 
-      const res = await fetch(`http://localhost:8000/api/v1/execucoes/${id}`, {
+      const res = await fetch(`${API_URL}/api/v1/execucoes/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

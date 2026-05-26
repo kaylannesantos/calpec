@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './RegisterPage.module.css'
+import { API_URL } from '../services/api'
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -34,7 +35,7 @@ export default function RegisterPage() {
         numero_oab: form.numero_oab || null,
         telefone: form.telefone || null,
       }
-      const res = await fetch('http://localhost:8000/api/v1/auth/registrar', {
+      const res = await fetch(`${API_URL}/api/v1/auth/registrar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
