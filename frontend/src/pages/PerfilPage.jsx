@@ -54,7 +54,7 @@ export default function PerfilPage() {
               {user.numero_oab && <div className={styles.infoBadge}>OAB: {user.numero_oab}</div>}
               {user.cpf && <p className={styles.infoDetalhe}>CPF: {user.cpf}</p>}
               <p className={styles.infoDetalhe}>Membro desde {new Date(user.criado_em).toLocaleDateString('pt-BR')}</p>
-              <button className={styles.btnSair} onClick={handleLogout}>Sair do sistema</button>
+              <button className={styles.btnSair} onClick={handleLogout}>Sair</button>
             </div>
             <div className={styles.formCard}>
               <form onSubmit={handleSubmit}>
