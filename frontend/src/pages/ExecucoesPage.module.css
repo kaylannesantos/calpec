@@ -111,3 +111,5 @@
 .historicoRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .historicoDias { font-size: 13px; font-weight: 500; color: #7ec88a; }
 .historicoData { font-size: 11px; color: rgba(255,255,255,0.3); }
+.badgeSemiaberto { background: rgba(255,209,102,0.12); color: #ffd166; }
+.badgeAberto { background: rgba(126,200,138,0.12); color: #7ec88a; }

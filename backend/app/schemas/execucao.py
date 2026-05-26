@@ -34,6 +34,7 @@ class ExecucaoResponse(BaseModel):
     dias_remidos: Optional[int]
     data_termino: Optional[date]
     data_progressao: Optional[date]
+    regime_inicial: Optional[str]
     regime_progressao: Optional[str]
     criado_em: datetime
 

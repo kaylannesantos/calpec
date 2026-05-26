@@ -42,6 +42,7 @@ class Execucao(Base):
     dias_remidos = Column(Integer, nullable=True)
     data_termino = Column(Date, nullable=True)
     data_progressao = Column(Date, nullable=True)
+    regime_inicial = Column(String, nullable=True)
     regime_progressao = Column(String, nullable=True)
 
     criado_em = Column(DateTime(timezone=True), server_default=func.now())

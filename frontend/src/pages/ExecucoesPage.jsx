@@ -405,8 +405,13 @@ export default function ExecucoesPage() {
                       <div>
                         <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)?.nome || `Apenado #${e.apenado_id}`}</span>
                         <div className={styles.cardTags}>
-                          <span className={`${styles.badge} ${progressaoVencida ? styles.badgeAlerta : styles.badgeFechado}`}>
-                            {e.regime_progressao || 'Fechado'}
+                          <span className={`${styles.badge} ${
+                            e.regime_inicial === 'Fechado' ? styles.badgeFechado :
+                            e.regime_inicial === 'Semiaberto' ? styles.badgeSemiaberto :
+                            e.regime_inicial === 'Aberto' ? styles.badgeAberto :
+                            styles.badgeFechado
+                          }`}>
+                            {e.regime_inicial || 'Fechado'}
                           </span>
                           {e.reincidente && <span className={`${styles.badge} ${styles.badgeReincidente}`}>Reincidente</span>}
                           <span className={`${styles.badge} ${styles.badgeNatureza}`}>{e.natureza_crime}</span>
