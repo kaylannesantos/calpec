@@ -216,7 +216,7 @@ function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
     e.preventDefault()
     setErro(''); setSucesso(''); setLoading(true)
     try {
-      const res = await fetch('${API_URL}/api/v1/remicoes/', {
+      const res = await fetch(`${API_URL}/api/v1/remicoes/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, execucao_id: execucaoId, quantidade: parseInt(form.quantidade) }),
@@ -325,8 +325,8 @@ export default function ExecucoesPage() {
     setCarregando(true)
     try {
       const [resExec, resApen] = await Promise.all([
-        fetch('${API_URL}/api/v1/execucoes/'),
-        fetch('${API_URL}/api/v1/apenados/'),
+        fetch(`${API_URL}/api/v1/execucoes/`),
+        fetch(`${API_URL}/api/v1/apenados/`),
       ])
       setExecucoes(await resExec.json())
       setApenados(await resApen.json())
