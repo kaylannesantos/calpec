@@ -1,17 +1,13 @@
 .fab { position: fixed; bottom: 24px; left: 24px; width: 52px; height: 52px; border-radius: 50%; background: #c9a96e; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 999; transition: transform 0.2s, background 0.2s; box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
 .fab:hover { transform: scale(1.08); background: #d4b87a; }
-
 .popup { position: fixed; bottom: 88px; left: 24px; width: 272px; background: #1a2633; border: 0.5px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; z-index: 999; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .title { font-size: 11px; font-weight: 500; color: #c9a96e; text-transform: uppercase; letter-spacing: 0.08em; }
 .close { background: transparent; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: color 0.2s; }
 .close:hover { color: #e8dcc8; }
-
 .display { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; text-align: right; }
 .exprLabel { font-size: 11px; color: rgba(255,255,255,0.3); min-height: 15px; }
 .result { font-size: 22px; font-weight: 500; color: #e8dcc8; min-height: 28px; word-break: break-all; }
-
 .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 12px; }
 .btn { background: rgba(255,255,255,0.06); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 7px; padding: 10px 6px; font-size: 14px; color: #e8dcc8; cursor: pointer; transition: background 0.15s; font-family: 'DM Sans', sans-serif; }
 .btn:hover { background: rgba(255,255,255,0.12); }
@@ -19,12 +15,14 @@
 .eq { background: #c9a96e; color: #0f1923; font-weight: 500; border-color: #c9a96e; }
 .eq:hover { background: #d4b87a; }
 .clear { color: #f08080; }
-
 .divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 10px; }
-
 .convTitle { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.tipoRow { display: flex; gap: 6px; margin-bottom: 10px; }
+.tipoBtn { flex: 1; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px; font-size: 11px; color: rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; }
+.tipoBtn:hover { border-color: #c9a96e; color: #c9a96e; }
+.tipoBtnAtivo { border-color: #c9a96e; color: #c9a96e; background: rgba(201,169,110,0.1); }
 .convRow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 .convInput { flex: 1; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: #e8dcc8; outline: none; min-width: 0; box-sizing: border-box; font-family: 'DM Sans', sans-serif; }
 .convInput:focus { border-color: #c9a96e; }
 .convLabel { font-size: 12px; color: rgba(255,255,255,0.4); white-space: nowrap; }
-.convResult { background: rgba(201,169,110,0.08); border: 0.5px solid rgba(201,169,110,0.2); border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #c9a96e; min-height: 32px; line-height: 1.6; }
+.convResult { background: rgba(201,169,110,0.08); border: 0.5px solid rgba(201,169,110,0.2); border-radius: 6px; padding: 8px 12px; font-size: 12px; color: #c9a96e; min-height: 32px; line-height: 1.6; margin-top: 4px; }
