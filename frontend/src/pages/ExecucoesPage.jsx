@@ -41,20 +41,13 @@ function calcularDiasFaltantes(dataProgressao) {
   return Math.ceil((prog - hoje) / (1000 * 60 * 60 * 24))
 }
 
-function CardEdicao({ execucao, onAtualizado }) {
-  const [aberto, setAberto] = useState(false)
+function FormEdicao({ execucao, onAtualizado, onFechar }) {
   const [form, setForm] = useState({
-    pena_anos: execucao.pena_anos,
-    pena_meses: execucao.pena_meses,
-    pena_dias: execucao.pena_dias,
-    natureza_crime: execucao.natureza_crime,
-    reincidente: execucao.reincidente,
+    pena_anos: execucao.pena_anos, pena_meses: execucao.pena_meses, pena_dias: execucao.pena_dias,
+    natureza_crime: execucao.natureza_crime, reincidente: execucao.reincidente,
     data_inicio_pena: execucao.data_inicio_pena,
-    detracao_inicio: execucao.detracao_inicio || '',
-    detracao_fim: execucao.detracao_fim || '',
-    dias_trabalhados: execucao.dias_trabalhados || 0,
-    horas_estudo: execucao.horas_estudo || 0,
-    obras_lidas: execucao.obras_lidas || 0,
+    detracao_inicio: execucao.detracao_inicio || '', detracao_fim: execucao.detracao_fim || '',
+    dias_trabalhados: execucao.dias_trabalhados || 0, horas_estudo: execucao.horas_estudo || 0, obras_lidas: execucao.obras_lidas || 0,
   })
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState('')
@@ -66,126 +59,68 @@ function CardEdicao({ execucao, onAtualizado }) {
   }
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setErro(''); setSucesso(''); setLoading(true)
+    e.preventDefault(); setErro(''); setSucesso(''); setLoading(true)
     try {
       const payload = {
-        ...form,
-        apenado_id: execucao.apenado_id,
-        pena_anos: parseInt(form.pena_anos) || 0,
-        pena_meses: parseInt(form.pena_meses) || 0,
-        pena_dias: parseInt(form.pena_dias) || 0,
-        dias_trabalhados: parseInt(form.dias_trabalhados) || 0,
-        horas_estudo: parseInt(form.horas_estudo) || 0,
-        obras_lidas: parseInt(form.obras_lidas) || 0,
-        detracao_inicio: form.detracao_inicio || null,
-        detracao_fim: form.detracao_fim || null,
+        ...form, apenado_id: execucao.apenado_id,
+        pena_anos: parseInt(form.pena_anos) || 0, pena_meses: parseInt(form.pena_meses) || 0,
+        pena_dias: parseInt(form.pena_dias) || 0, dias_trabalhados: parseInt(form.dias_trabalhados) || 0,
+        horas_estudo: parseInt(form.horas_estudo) || 0, obras_lidas: parseInt(form.obras_lidas) || 0,
+        detracao_inicio: form.detracao_inicio || null, detracao_fim: form.detracao_fim || null,
       }
       const res = await fetch(`${API_URL}/api/v1/execucoes/${execucao.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || 'Erro ao atualizar')
       setSucesso('Execução atualizada com sucesso!')
       onAtualizado()
-      setTimeout(() => { setSucesso(''); setAberto(false) }, 1500)
-    } catch (err) {
-      setErro(err.message)
-    } finally {
-      setLoading(false)
-    }
+      setTimeout(() => { setSucesso(''); onFechar() }, 1500)
+    } catch (err) { setErro(err.message) } finally { setLoading(false) }
   }
 
   return (
-    <div className={styles.edicaoWrap}>
-      <button className={styles.btnEditar} onClick={() => { setAberto(!aberto); setErro(''); setSucesso('') }} type="button">
-        {aberto ? '▲ Fechar edição' : '✎ Editar execução'}
-      </button>
-
-      {aberto && (
-        <form onSubmit={handleSubmit} className={styles.edicaoForm}>
-          <p className={styles.edicaoTitulo}>Editar dados da execução</p>
-
-          <div className={styles.edicaoGrid}>
-            <div className={styles.edicaoSection}>
-              <p className={styles.edicaoSectionLabel}>Pena</p>
-              <div className={styles.edicaoRow}>
-                <div className={styles.edicaoField}>
-                  <label className={styles.remicaoLabel}>Anos</label>
-                  <input className={styles.remicaoInput} type="number" name="pena_anos" min="0" value={form.pena_anos} onChange={handleChange} />
-                </div>
-                <div className={styles.edicaoField}>
-                  <label className={styles.remicaoLabel}>Meses</label>
-                  <input className={styles.remicaoInput} type="number" name="pena_meses" min="0" max="11" value={form.pena_meses} onChange={handleChange} />
-                </div>
-                <div className={styles.edicaoField}>
-                  <label className={styles.remicaoLabel}>Dias</label>
-                  <input className={styles.remicaoInput} type="number" name="pena_dias" min="0" max="29" value={form.pena_dias} onChange={handleChange} />
-                </div>
-              </div>
-
-              <div className={styles.edicaoField}>
-                <label className={styles.remicaoLabel}>Natureza do crime</label>
-                <select className={styles.remicaoInput} name="natureza_crime" value={form.natureza_crime} onChange={handleChange}>
-                  {naturezas.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
-                </select>
-              </div>
-
-              <div className={styles.edicaoCheck}>
-                <input type="checkbox" id={`reincidente_${execucao.id}`} name="reincidente" checked={form.reincidente} onChange={handleChange} />
-                <label htmlFor={`reincidente_${execucao.id}`} className={styles.remicaoLabel}>Réu reincidente</label>
-              </div>
-
-              <div className={styles.edicaoField}>
-                <label className={styles.remicaoLabel}>Início da pena</label>
-                <input className={styles.remicaoInput} type="date" name="data_inicio_pena" value={form.data_inicio_pena} onChange={handleChange} required />
-              </div>
-            </div>
-
-            <div className={styles.edicaoSection}>
-              <p className={styles.edicaoSectionLabel}>Detração</p>
-              <div className={styles.edicaoRow}>
-                <div className={styles.edicaoField}>
-                  <label className={styles.remicaoLabel}>Início</label>
-                  <input className={styles.remicaoInput} type="date" name="detracao_inicio" value={form.detracao_inicio} onChange={handleChange} />
-                </div>
-                <div className={styles.edicaoField}>
-                  <label className={styles.remicaoLabel}>Fim</label>
-                  <input className={styles.remicaoInput} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} />
-                </div>
-              </div>
-
-              <p className={styles.edicaoSectionLabel} style={{marginTop: '12px'}}>Remição inicial</p>
-              <div className={styles.edicaoField}>
-                <label className={styles.remicaoLabel}>Dias trabalhados</label>
-                <input className={styles.remicaoInput} type="number" name="dias_trabalhados" min="0" value={form.dias_trabalhados} onChange={handleChange} />
-              </div>
-              <div className={styles.edicaoField}>
-                <label className={styles.remicaoLabel}>Horas de estudo</label>
-                <input className={styles.remicaoInput} type="number" name="horas_estudo" min="0" value={form.horas_estudo} onChange={handleChange} />
-              </div>
-              <div className={styles.edicaoField}>
-                <label className={styles.remicaoLabel}>Obras lidas</label>
-                <input className={styles.remicaoInput} type="number" name="obras_lidas" min="0" max="12" value={form.obras_lidas} onChange={handleChange} />
-              </div>
-            </div>
+    <form onSubmit={handleSubmit} className={styles.edicaoForm}>
+      <p className={styles.edicaoTitulo}>Editar dados da execução</p>
+      <div className={styles.edicaoGrid}>
+        <div className={styles.edicaoSection}>
+          <p className={styles.edicaoSectionLabel}>Pena</p>
+          <div className={styles.edicaoRow}>
+            <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Anos</label><input className={styles.remicaoInput} type="number" name="pena_anos" min="0" value={form.pena_anos} onChange={handleChange} /></div>
+            <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Meses</label><input className={styles.remicaoInput} type="number" name="pena_meses" min="0" max="11" value={form.pena_meses} onChange={handleChange} /></div>
+            <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Dias</label><input className={styles.remicaoInput} type="number" name="pena_dias" min="0" max="29" value={form.pena_dias} onChange={handleChange} /></div>
           </div>
-
-          {erro && <p className={styles.remicaoErro}>{erro}</p>}
-          {sucesso && <p className={styles.remicaoSucesso}>{sucesso}</p>}
-          <button className={styles.btnSalvarEdicao} type="submit" disabled={loading}>
-            {loading ? 'Salvando...' : 'Salvar alterações'}
-          </button>
-        </form>
-      )}
-    </div>
+          <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Natureza do crime</label>
+            <select className={styles.remicaoInput} name="natureza_crime" value={form.natureza_crime} onChange={handleChange}>
+              {naturezas.map(n => <option key={n.value} value={n.value}>{n.label}</option>)}
+            </select>
+          </div>
+          <div className={styles.edicaoCheck}>
+            <input type="checkbox" id={`r_${execucao.id}`} name="reincidente" checked={form.reincidente} onChange={handleChange} />
+            <label htmlFor={`r_${execucao.id}`} className={styles.remicaoLabel}>Réu reincidente</label>
+          </div>
+          <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Início da pena</label><input className={styles.remicaoInput} type="date" name="data_inicio_pena" value={form.data_inicio_pena} onChange={handleChange} required /></div>
+        </div>
+        <div className={styles.edicaoSection}>
+          <p className={styles.edicaoSectionLabel}>Detração</p>
+          <div className={styles.edicaoRow}>
+            <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Início</label><input className={styles.remicaoInput} type="date" name="detracao_inicio" value={form.detracao_inicio} onChange={handleChange} /></div>
+            <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Fim</label><input className={styles.remicaoInput} type="date" name="detracao_fim" value={form.detracao_fim} onChange={handleChange} /></div>
+          </div>
+          <p className={styles.edicaoSectionLabel} style={{marginTop: '12px'}}>Remição inicial</p>
+          <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Dias trabalhados</label><input className={styles.remicaoInput} type="number" name="dias_trabalhados" min="0" value={form.dias_trabalhados} onChange={handleChange} /></div>
+          <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Horas de estudo</label><input className={styles.remicaoInput} type="number" name="horas_estudo" min="0" value={form.horas_estudo} onChange={handleChange} /></div>
+          <div className={styles.edicaoField}><label className={styles.remicaoLabel}>Obras lidas</label><input className={styles.remicaoInput} type="number" name="obras_lidas" min="0" max="12" value={form.obras_lidas} onChange={handleChange} /></div>
+        </div>
+      </div>
+      {erro && <p className={styles.remicaoErro}>{erro}</p>}
+      {sucesso && <p className={styles.remicaoSucesso}>{sucesso}</p>}
+      <button className={styles.btnSalvarEdicao} type="submit" disabled={loading}>{loading ? 'Salvando...' : 'Salvar alterações'}</button>
+    </form>
   )
 }
 
-function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
-  const [aberto, setAberto] = useState(false)
+function FormRemicao({ execucaoId, onRemicaoAdicionada, onFechar }) {
   const [historico, setHistorico] = useState([])
   const [form, setForm] = useState({ tipo: 'trabalho', quantidade: '', data_referencia: '', observacao: '' })
   const [loading, setLoading] = useState(false)
@@ -199,108 +134,72 @@ function CardRemicao({ execucaoId, onRemicaoAdicionada }) {
     leitura: (parseInt(form.quantidade) || 0) * 4,
   }
 
-  const carregarHistorico = async () => {
-    try {
-      const res = await fetch(`${API_URL}/api/v1/remicoes/execucao/${execucaoId}`)
-      setHistorico(await res.json())
-    } catch {}
-  }
-
-  const handleAbrir = () => {
-    if (!aberto) carregarHistorico()
-    setAberto(!aberto)
-    setErro(''); setSucesso('')
-  }
+  useEffect(() => {
+    fetch(`${API_URL}/api/v1/remicoes/execucao/${execucaoId}`)
+      .then(r => r.json()).then(setHistorico).catch(() => {})
+  }, [execucaoId])
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setErro(''); setSucesso(''); setLoading(true)
+    e.preventDefault(); setErro(''); setSucesso(''); setLoading(true)
     try {
       const res = await fetch(`${API_URL}/api/v1/remicoes/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, execucao_id: execucaoId, quantidade: parseInt(form.quantidade) }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || 'Erro ao registrar')
       setSucesso(`${data.dias_remidos} dia(s) remido(s) com sucesso!`)
       setForm({ tipo: 'trabalho', quantidade: '', data_referencia: '', observacao: '' })
-      carregarHistorico()
+      fetch(`${API_URL}/api/v1/remicoes/execucao/${execucaoId}`).then(r => r.json()).then(setHistorico).catch(() => {})
       onRemicaoAdicionada()
-    } catch (err) {
-      setErro(err.message)
-    } finally {
-      setLoading(false)
-    }
+    } catch (err) { setErro(err.message) } finally { setLoading(false) }
   }
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
   return (
-    <div className={styles.remicaoWrap}>
-      <button className={styles.btnRemicao} onClick={handleAbrir} type="button">
-        {aberto ? '▲ Fechar' : '+ Registrar Remição'}
-      </button>
-
-      {aberto && (
-        <div className={styles.remicaoBox}>
-          <form onSubmit={handleSubmit} className={styles.remicaoForm}>
-            <p className={styles.remicaoTitulo}>Nova remição</p>
-            <div className={styles.remicaoGrid}>
-              <div className={styles.remicaoField}>
-                <label className={styles.remicaoLabel}>Tipo</label>
-                <select className={styles.remicaoInput} value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })}>
-                  <option value="trabalho">Trabalho</option>
-                  <option value="estudo">Estudo</option>
-                  <option value="leitura">Leitura</option>
-                </select>
+    <div className={styles.remicaoBox}>
+      <form onSubmit={handleSubmit} className={styles.remicaoForm}>
+        <p className={styles.remicaoTitulo}>Nova remição</p>
+        <div className={styles.remicaoGrid}>
+          <div className={styles.remicaoField}><label className={styles.remicaoLabel}>Tipo</label>
+            <select className={styles.remicaoInput} value={form.tipo} onChange={e => setForm({ ...form, tipo: e.target.value })}>
+              <option value="trabalho">Trabalho</option>
+              <option value="estudo">Estudo</option>
+              <option value="leitura">Leitura</option>
+            </select>
+          </div>
+          <div className={styles.remicaoField}><label className={styles.remicaoLabel}>{labels[form.tipo]}</label>
+            <input className={styles.remicaoInput} type="number" min="1" value={form.quantidade} onChange={e => setForm({ ...form, quantidade: e.target.value })} required />
+          </div>
+          <div className={styles.remicaoField}><label className={styles.remicaoLabel}>Data de referência</label>
+            <input className={styles.remicaoInput} type="date" value={form.data_referencia} onChange={e => setForm({ ...form, data_referencia: e.target.value })} required />
+          </div>
+        </div>
+        <div className={styles.remicaoField}><label className={styles.remicaoLabel}>Observação (opcional)</label>
+          <input className={styles.remicaoInput} type="text" placeholder="Ex: Trabalho na oficina" value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} />
+        </div>
+        {form.quantidade && <div className={styles.previa}>Prévia: <strong>{calcPrevia[form.tipo]} dia(s)</strong> serão remidos</div>}
+        {erro && <p className={styles.remicaoErro}>{erro}</p>}
+        {sucesso && <p className={styles.remicaoSucesso}>{sucesso}</p>}
+        <button className={styles.btnSalvar} type="submit" disabled={loading}>{loading ? 'Salvando...' : 'Salvar remição'}</button>
+      </form>
+      {historico.length > 0 && (
+        <div className={styles.historico}>
+          <p className={styles.historicoTitulo}>Histórico de remições</p>
+          {historico.map(r => (
+            <div key={r.id} className={styles.historicoItem}>
+              <div className={styles.historicoInfo}>
+                <span className={`${styles.historicoBadge} ${styles[`badge_${r.tipo}`]}`}>{r.tipo}</span>
+                <span className={styles.historicoDetalhe}>{r.quantidade} {r.tipo === 'trabalho' ? 'dias' : r.tipo === 'estudo' ? 'horas' : 'obras'}</span>
+                {r.observacao && <span className={styles.historicoObs}>{r.observacao}</span>}
               </div>
-              <div className={styles.remicaoField}>
-                <label className={styles.remicaoLabel}>{labels[form.tipo]}</label>
-                <input className={styles.remicaoInput} type="number" min="1" value={form.quantidade}
-                  onChange={e => setForm({ ...form, quantidade: e.target.value })} required />
-              </div>
-              <div className={styles.remicaoField}>
-                <label className={styles.remicaoLabel}>Data de referência</label>
-                <input className={styles.remicaoInput} type="date" value={form.data_referencia}
-                  onChange={e => setForm({ ...form, data_referencia: e.target.value })} required />
+              <div className={styles.historicoRight}>
+                <span className={styles.historicoDias}>−{r.dias_remidos}d</span>
+                <span className={styles.historicoData}>{formatarData(r.data_referencia)}</span>
               </div>
             </div>
-            <div className={styles.remicaoField}>
-              <label className={styles.remicaoLabel}>Observação (opcional)</label>
-              <input className={styles.remicaoInput} type="text" placeholder="Ex: Trabalho na oficina"
-                value={form.observacao} onChange={e => setForm({ ...form, observacao: e.target.value })} />
-            </div>
-            {form.quantidade && (
-              <div className={styles.previa}>
-                Prévia: <strong>{calcPrevia[form.tipo]} dia(s)</strong> serão remidos
-              </div>
-            )}
-            {erro && <p className={styles.remicaoErro}>{erro}</p>}
-            {sucesso && <p className={styles.remicaoSucesso}>{sucesso}</p>}
-            <button className={styles.btnSalvar} type="submit" disabled={loading}>
-              {loading ? 'Salvando...' : 'Salvar remição'}
-            </button>
-          </form>
-
-          {historico.length > 0 && (
-            <div className={styles.historico}>
-              <p className={styles.historicoTitulo}>Histórico de remições</p>
-              {historico.map(r => (
-                <div key={r.id} className={styles.historicoItem}>
-                  <div className={styles.historicoInfo}>
-                    <span className={`${styles.historicoBadge} ${styles[`badge_${r.tipo}`]}`}>{r.tipo}</span>
-                    <span className={styles.historicoDetalhe}>{r.quantidade} {r.tipo === 'trabalho' ? 'dias' : r.tipo === 'estudo' ? 'horas' : 'obras'}</span>
-                    {r.observacao && <span className={styles.historicoObs}>{r.observacao}</span>}
-                  </div>
-                  <div className={styles.historicoRight}>
-                    <span className={styles.historicoDias}>−{r.dias_remidos}d</span>
-                    <span className={styles.historicoData}>{formatarData(r.data_referencia)}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       )}
     </div>
@@ -318,6 +217,8 @@ export default function ExecucoesPage() {
   const [filtro, setFiltro] = useState(apenadoId || '')
   const [apenados, setApenados] = useState([])
   const [gerandoPDF, setGerandoPDF] = useState(null)
+  const [edicaoAberta, setEdicaoAberta] = useState(null)
+  const [remicaoAberta, setRemicaoAberta] = useState(null)
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
@@ -330,8 +231,7 @@ export default function ExecucoesPage() {
       ])
       setExecucoes(await resExec.json())
       setApenados(await resApen.json())
-    } catch {}
-    finally { setCarregando(false) }
+    } catch {} finally { setCarregando(false) }
   }
 
   useEffect(() => { carregar() }, [])
@@ -350,11 +250,18 @@ export default function ExecucoesPage() {
       const resRemicoes = await fetch(`${API_URL}/api/v1/remicoes/execucao/${execucao.id}`)
       const remicoes = await resRemicoes.json()
       gerarPDFExecucao({ apenado, execucao, remicoes, visualizar })
-    } catch (err) {
-      console.error('Erro ao gerar PDF:', err)
-    } finally {
-      setGerandoPDF(null)
-    }
+    } catch (err) { console.error('Erro ao gerar PDF:', err) }
+    finally { setGerandoPDF(null) }
+  }
+
+  const toggleEdicao = (id) => {
+    setEdicaoAberta(prev => prev === id ? null : id)
+    setRemicaoAberta(null)
+  }
+
+  const toggleRemicao = (id) => {
+    setRemicaoAberta(prev => prev === id ? null : id)
+    setEdicaoAberta(null)
   }
 
   return (
@@ -408,20 +315,17 @@ export default function ExecucoesPage() {
                           <span className={`${styles.badge} ${
                             e.regime_inicial === 'Fechado' ? styles.badgeFechado :
                             e.regime_inicial === 'Semiaberto' ? styles.badgeSemiaberto :
-                            e.regime_inicial === 'Aberto' ? styles.badgeAberto :
-                            styles.badgeFechado
-                          }`}>
-                            {e.regime_inicial || 'Fechado'}
-                          </span>
+                            e.regime_inicial === 'Aberto' ? styles.badgeAberto : styles.badgeFechado
+                          }`}>{e.regime_inicial || 'Fechado'}</span>
                           {e.reincidente && <span className={`${styles.badge} ${styles.badgeReincidente}`}>Reincidente</span>}
                           <span className={`${styles.badge} ${styles.badgeNatureza}`}>{e.natureza_crime}</span>
                         </div>
                       </div>
                       <div className={styles.cardAcoes}>
-                        <button className={styles.btnPDF} onClick={() => handleGerarPDF(e, true)} disabled={gerandoPDF === e.id} title="Visualizar PDF">
+                        <button className={styles.btnPDF} onClick={() => handleGerarPDF(e, true)} disabled={gerandoPDF === e.id}>
                           {gerandoPDF === e.id ? '...' : '👁 Ver'}
                         </button>
-                        <button className={styles.btnPDFDownload} onClick={() => handleGerarPDF(e, false)} disabled={gerandoPDF === e.id} title="Baixar PDF">
+                        <button className={styles.btnPDFDownload} onClick={() => handleGerarPDF(e, false)} disabled={gerandoPDF === e.id}>
                           ↓ PDF
                         </button>
                         <span className={styles.cardId}>#{e.id}</span>
@@ -466,12 +370,26 @@ export default function ExecucoesPage() {
 
                     {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
 
-                  <div className={styles.acoesCard}>
-                    <div className={styles.botoesAcoes}>
-                      <CardEdicao execucao={e} onAtualizado={carregar} />
-                      <CardRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />
+                    <div className={styles.acoesCard}>
+                      <div className={styles.botoesAcoes}>
+                        <button
+                          className={`${styles.btnEditar} ${edicaoAberta === e.id ? styles.btnAtivoEditar : ''}`}
+                          onClick={() => toggleEdicao(e.id)} type="button">
+                          {edicaoAberta === e.id ? '▲ Fechar edição' : '✎ Editar execução'}
+                        </button>
+                        <button
+                          className={`${styles.btnRemicao} ${remicaoAberta === e.id ? styles.btnAtivoRemicao : ''}`}
+                          onClick={() => toggleRemicao(e.id)} type="button">
+                          {remicaoAberta === e.id ? '▲ Fechar' : '+ Registrar Remição'}
+                        </button>
+                      </div>
+                      {edicaoAberta === e.id && (
+                        <FormEdicao execucao={e} onAtualizado={carregar} onFechar={() => setEdicaoAberta(null)} />
+                      )}
+                      {remicaoAberta === e.id && (
+                        <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} onFechar={() => setRemicaoAberta(null)} />
+                      )}
                     </div>
-                  </div>
                   </div>
                 )
               })}
