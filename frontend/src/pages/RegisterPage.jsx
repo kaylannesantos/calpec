@@ -3,59 +3,52 @@ import { useNavigate } from 'react-router-dom'
 import styles from './RegisterPage.module.css'
 import { API_URL } from '../services/api'
 
+function EyeIcon({ open }) {
+  return open ? (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+    </svg>
+  ) : (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  )
+}
+
 export default function RegisterPage() {
   const navigate = useNavigate()
-  const [form, setForm] = useState({
-    nome: '', email: '', cpf: '', numero_oab: '', telefone: '', password: '', confirmar_senha: ''
-  })
+  const [form, setForm] = useState({ nome: '', email: '', cpf: '', numero_oab: '', telefone: '', password: '', confirmar_senha: '' })
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState('')
   const [loading, setLoading] = useState(false)
+  const [mostrarSenha, setMostrarSenha] = useState(false)
+  const [mostrarConfirmar, setMostrarConfirmar] = useState(false)
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErro(''); setSucesso('')
-
-    if (form.password !== form.confirmar_senha) {
-      setErro('As senhas não coincidem.'); return
-    }
-    if (form.password.length < 6) {
-      setErro('A senha deve ter pelo menos 6 caracteres.'); return
-    }
-
+    if (form.password !== form.confirmar_senha) { setErro('As senhas não coincidem.'); return }
+    if (form.password.length < 6) { setErro('A senha deve ter pelo menos 6 caracteres.'); return }
     setLoading(true)
     try {
-      const payload = {
-        nome: form.nome,
-        email: form.email,
-        password: form.password,
-        cpf: form.cpf || null,
-        numero_oab: form.numero_oab || null,
-        telefone: form.telefone || null,
-      }
+      const payload = { nome: form.nome, email: form.email, password: form.password, cpf: form.cpf || null, numero_oab: form.numero_oab || null, telefone: form.telefone || null }
       const res = await fetch(`${API_URL}/api/v1/auth/registrar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.detail || 'Erro ao cadastrar')
       setSucesso('Cadastro realizado com sucesso! Redirecionando...')
       setTimeout(() => navigate('/login'), 2000)
-    } catch (err) {
-      setErro(err.message)
-    } finally {
-      setLoading(false)
-    }
+    } catch (err) { setErro(err.message) } finally { setLoading(false) }
   }
 
   return (
     <div className={styles.root}>
       <div className={styles.bgPattern} />
       <div className={styles.accentBar} />
-
       <nav className={styles.nav}>
         <div className={styles.logo} onClick={() => navigate('/login')}>
           <div className={styles.logoIcon}>
@@ -67,30 +60,24 @@ export default function RegisterPage() {
         </div>
         <span className={styles.navLink} onClick={() => navigate('/login')}>← Voltar ao login</span>
       </nav>
-
       <div className={styles.body}>
         <div className={styles.card}>
           <div className={styles.cardHeader}>
             <div className={styles.seal}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                <circle cx="12" cy="7" r="4"/>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
             </div>
             <h1 className={styles.title}>Criar Conta</h1>
             <p className={styles.subtitle}>Preencha os dados para acessar o sistema</p>
           </div>
-
           <div className={styles.divider} />
-
           <form onSubmit={handleSubmit}>
             <p className={styles.sectionLabel}>Dados pessoais</p>
-
             <div className={styles.field}>
               <label className={styles.label}>Nome completo *</label>
               <input className={styles.input} name="nome" value={form.nome} onChange={handleChange} placeholder="Seu nome completo" required />
             </div>
-
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>E-mail *</label>
@@ -101,7 +88,6 @@ export default function RegisterPage() {
                 <input className={styles.input} name="cpf" value={form.cpf} onChange={handleChange} placeholder="000.000.000-00" />
               </div>
             </div>
-
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>Nº OAB</label>
@@ -112,35 +98,31 @@ export default function RegisterPage() {
                 <input className={styles.input} name="telefone" value={form.telefone} onChange={handleChange} placeholder="(00) 00000-0000" />
               </div>
             </div>
-
             <div className={styles.dividerLight} />
             <p className={styles.sectionLabel}>Acesso ao sistema</p>
-
             <div className={styles.row}>
               <div className={styles.field}>
                 <label className={styles.label}>Senha *</label>
-                <input className={styles.input} type="password" name="password" value={form.password} onChange={handleChange} placeholder="Mínimo 6 caracteres" required />
+                <div className={styles.inputWrap}>
+                  <input className={styles.input} type={mostrarSenha ? 'text' : 'password'} name="password" value={form.password} onChange={handleChange} placeholder="Mínimo 6 caracteres" required />
+                  <button type="button" className={styles.eyeBtn} onClick={() => setMostrarSenha(!mostrarSenha)}><EyeIcon open={mostrarSenha} /></button>
+                </div>
               </div>
               <div className={styles.field}>
                 <label className={styles.label}>Confirmar senha *</label>
-                <input className={styles.input} type="password" name="confirmar_senha" value={form.confirmar_senha} onChange={handleChange} placeholder="Repita a senha" required />
+                <div className={styles.inputWrap}>
+                  <input className={styles.input} type={mostrarConfirmar ? 'text' : 'password'} name="confirmar_senha" value={form.confirmar_senha} onChange={handleChange} placeholder="Repita a senha" required />
+                  <button type="button" className={styles.eyeBtn} onClick={() => setMostrarConfirmar(!mostrarConfirmar)}><EyeIcon open={mostrarConfirmar} /></button>
+                </div>
               </div>
             </div>
-
             {erro && <p className={styles.erro}>{erro}</p>}
             {sucesso && <p className={styles.sucesso}>{sucesso}</p>}
-
-            <button className={styles.btn} type="submit" disabled={loading}>
-              {loading ? 'Cadastrando...' : 'Criar conta'}
-            </button>
+            <button className={styles.btn} type="submit" disabled={loading}>{loading ? 'Cadastrando...' : 'Criar conta'}</button>
           </form>
-
-          <p className={styles.login}>
-            Já tem conta? <span onClick={() => navigate('/login')}>Faça login</span>
-          </p>
+          <p className={styles.login}>Já tem conta? <span onClick={() => navigate('/login')}>Faça login</span></p>
         </div>
       </div>
-
       <footer className={styles.footer}>© 2025 CalPEC · Sistema Eletrônico de Execução Penal</footer>
     </div>
   )

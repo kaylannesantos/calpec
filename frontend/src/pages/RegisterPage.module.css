@@ -33,3 +33,7 @@
 .login span { color: #c9a96e; cursor: pointer; transition: opacity 0.2s; }
 .login span:hover { opacity: 0.75; }
 .footer { text-align: center; padding: 14px; font-size: 11px; color: rgba(255,255,255,0.15); letter-spacing: 0.03em; border-top: 0.5px solid rgba(255,255,255,0.05); position: relative; z-index: 2; }
+.inputWrap { position: relative; }
+.inputWrap .input { padding-right: 38px; }
+.eyeBtn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: rgba(255,255,255,0.3); cursor: pointer; padding: 4px; transition: color 0.2s; display: flex; align-items: center; }
+.eyeBtn:hover { color: #c9a96e; }
