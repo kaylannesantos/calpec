@@ -128,7 +128,7 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
   doc.rect(margem, y + 2, W - margem * 2, 0.3, 'F')
   y += 8
 
-  addLinha('REGIME ATUAL', execucao.regime_progressao || 'Fechado', col1, y)
+  addLinha('REGIME ATUAL', execucao.regime_inicial || 'Fechado', col1, y)
   addLinha('DATA DE PROGRESSÃO', formatarData(execucao.data_progressao), col2, y)
   addLinha('DIAS REMIDOS', `${execucao.dias_remidos ?? 0} dias`, col3, y)
   y += 20
