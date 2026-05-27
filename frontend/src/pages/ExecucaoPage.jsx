@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Navbar from '../components/layout/Navbar'
 import { API_URL } from '../services/api'
 import styles from './ExecucaoPage.module.css'
+import Calculadora from '../components/ui/Calculadora'
 
 const naturezas = [
   { value: 'comum', label: 'Crime comum (sem violência)' },
@@ -178,6 +179,7 @@ export default function ExecucaoPage() {
           )}
         </div>
       </div>
+      <Calculadora /> {/* Componente de calculadora de pena para consulta rápida */}
     </div>
   )
 }
