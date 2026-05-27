@@ -135,7 +135,7 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
 
   // ─── ETAPAS VISUAIS ──────────────────────────────────
   const etapas = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Extinta']
-  const regimeAtual = execucao.regime_progressao || 'Fechado'
+  const regimeAtual = execucao.regime_inicial || 'Fechado'
   const etapaAtual = etapas.findIndex(e => regimeAtual.includes(e.split(' ')[0]))
   const etapaW = (W - margem * 2) / etapas.length
 
