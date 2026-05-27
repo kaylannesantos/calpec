@@ -67,7 +67,7 @@
 .btnEditar:hover { border-color: #c9a96e; color: #c9a96e; }
 .edicaoForm { margin-top: 14px; background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 16px 18px; }
 .edicaoTitulo { font-size: 11px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px; }
-.edicaoGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 14px; }
+.edicaoGrid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
 .edicaoSection { min-width: 0; }
 .edicaoSectionLabel { font-size: 10px; color: #c9a96e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; font-weight: 500; }
 .edicaoRow { display: flex; gap: 8px; margin-bottom: 8px; width: 100%; }
