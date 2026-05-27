@@ -466,10 +466,12 @@ export default function ExecucoesPage() {
 
                     {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
 
-                    <div className={styles.acoesCard}>
+                  <div className={styles.acoesCard}>
+                    <div className={styles.botoesAcoes}>
                       <CardEdicao execucao={e} onAtualizado={carregar} />
                       <CardRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />
                     </div>
+                  </div>
                   </div>
                 )
               })}
