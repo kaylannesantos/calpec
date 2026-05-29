@@ -84,7 +84,7 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-      <footer className={styles.footer}>© 2025 CalPEC · Sistema Eletrônico de Execução Penal</footer>
+      <footer className={styles.footer}>© 2025 CalPEC · Sistema Eletrônico de Execução Criminal</footer>
     </div>
   )
 }

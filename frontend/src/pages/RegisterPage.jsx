@@ -123,7 +123,7 @@ export default function RegisterPage() {
           <p className={styles.login}>Já tem conta? <span onClick={() => navigate('/login')}>Faça login</span></p>
         </div>
       </div>
-      <footer className={styles.footer}>© 2025 CalPEC · Sistema Eletrônico de Execução Penal</footer>
+      <footer className={styles.footer}>© 2025 CalPEC · Sistema Eletrônico de Execução Criminal</footer>
     </div>
   )
 }

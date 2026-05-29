@@ -6,7 +6,13 @@ from app.db.database import get_db
 from app.models.remicao import Remicao
 from app.models.execucao import Execucao
 from app.schemas.remicao import RemicaoCreate, RemicaoResponse
-from app.utils.calculos_lep import calcular_execucao
+from app.utils.calculos_lep import (
+    calcular_percentual_progressao,
+    determinar_regime_progressao,
+    pena_para_dias,
+    calcular_detracao,
+    dias_para_extenso
+)
 
 router = APIRouter()
 
@@ -42,38 +48,40 @@ def registrar_remicao(dados: RemicaoCreate, db: Session = Depends(get_db)):
     db.add(remicao)
     db.flush()
 
-    # 3. Somar todas as remições da execução para ter o total atualizado
-    from app.models.remicao import Remicao as RemicaoModel
-    total_remido = db.query(RemicaoModel).filter(
-        RemicaoModel.execucao_id == dados.execucao_id
-    ).with_entities(RemicaoModel.dias_remidos).all()
+    # 3. Somar todas as remições para ter o total atualizado
+    total_remido = db.query(Remicao).filter(
+        Remicao.execucao_id == dados.execucao_id
+    ).with_entities(Remicao.dias_remidos).all()
     total_dias_remidos = sum(r.dias_remidos for r in total_remido)
 
-    # 4. Recalcular execução completa com novo total de remição
-    resultado = calcular_execucao(
-        pena_anos=execucao.pena_anos,
-        pena_meses=execucao.pena_meses,
-        pena_dias=execucao.pena_dias,
-        natureza_crime=execucao.natureza_crime.value,
-        reincidente=execucao.reincidente,
-        data_inicio=execucao.data_inicio_pena,
-        detracao_inicio=execucao.detracao_inicio,
-        detracao_fim=execucao.detracao_fim,
-        dias_trabalhados=0,
-        horas_estudo=0,
-        obras_lidas=0,
+    # 4. Recalcular pena base (com detração)
+    pena_total = pena_para_dias(execucao.pena_anos, execucao.pena_meses, execucao.pena_dias)
+    dias_detracao = calcular_detracao(execucao.detracao_inicio, execucao.detracao_fim)
+    pena_base = pena_total - dias_detracao
+
+    # 5. Pena efetiva após remições
+    pena_efetiva = pena_base - total_dias_remidos
+
+    # 6. Recalcular data de progressão com base na pena efetiva
+    percentual = calcular_percentual_progressao(
+        execucao.natureza_crime.value,
+        execucao.reincidente
     )
+    dias_para_progressao = int(pena_efetiva * percentual)
+    nova_data_progressao = execucao.data_inicio_pena + timedelta(days=dias_para_progressao)
 
-    # Calcular nova data de término considerando total de remições
-    nova_pena_efetiva = resultado["pena_base_dias"] - total_dias_remidos
-    nova_data_termino = execucao.data_inicio_pena + timedelta(days=nova_pena_efetiva)
+    # 7. Recalcular data de término
+    nova_data_termino = execucao.data_inicio_pena + timedelta(days=pena_efetiva)
 
-    # 5. Atualizar execução no banco
+    # 8. Regime de progressão
+    regime_progressao = determinar_regime_progressao(execucao.regime_inicial or 'Fechado')
+
+    # 9. Atualizar execução
     execucao.dias_remidos = total_dias_remidos
     execucao.data_termino = nova_data_termino
-    execucao.data_progressao = resultado["data_progressao"]
-    execucao.regime_progressao = resultado["regime_progressao"]
-    execucao.pena_total_dias = resultado["pena_base_dias"]
+    execucao.data_progressao = nova_data_progressao
+    execucao.regime_progressao = regime_progressao
+    execucao.pena_total_dias = pena_base
 
     db.commit()
     db.refresh(remicao)
