@@ -120,3 +120,6 @@
 .historicoRight { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
 .historicoDias { font-size: 13px; font-weight: 500; color: #7ec88a; }
 .historicoData { font-size: 11px; color: rgba(255,255,255,0.3); }
+.btnProgredir { width: 100%; margin-top: 12px; background: rgba(126,200,138,0.1); border: 0.5px solid #7ec88a; color: #7ec88a; border-radius: 8px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+.btnProgredir:hover { background: rgba(126,200,138,0.2); }
+.btnProgredir:disabled { opacity: 0.5; cursor: not-allowed; }

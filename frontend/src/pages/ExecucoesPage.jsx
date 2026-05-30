@@ -219,6 +219,7 @@ export default function ExecucoesPage() {
   const [gerandoPDF, setGerandoPDF] = useState(null)
   const [edicaoAberta, setEdicaoAberta] = useState(null)
   const [remicaoAberta, setRemicaoAberta] = useState(null)
+  const [progredindo, setProgredindo] = useState(null)
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
@@ -252,6 +253,19 @@ export default function ExecucoesPage() {
       gerarPDFExecucao({ apenado, execucao, remicoes, visualizar })
     } catch (err) { console.error('Erro ao gerar PDF:', err) }
     finally { setGerandoPDF(null) }
+  }
+
+  const handleProgredir = async (execucao) => {
+    if (!window.confirm(`Confirmar progressão de "${execucao.regime_inicial}" para "${execucao.regime_progressao}"?\n\nEssa ação documenta o deferimento judicial.`)) return
+    setProgredindo(execucao.id)
+    try {
+      const res = await fetch(`${API_URL}/api/v1/execucoes/${execucao.id}/progredir`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+      })
+      if (!res.ok) { const data = await res.json(); alert(data.detail || 'Erro'); return }
+      await carregar()
+    } catch { alert('Erro ao registrar progressão') }
+    finally { setProgredindo(null) }
   }
 
   const toggleEdicao = (id) => {
@@ -367,6 +381,12 @@ export default function ExecucoesPage() {
                         </span>
                       </div>
                     </div>
+
+                    {progressaoVencida && e.regime_inicial !== 'Livramento Condicional' && e.regime_inicial !== 'Pena Extinta' && (
+                      <button className={styles.btnProgredir} onClick={() => handleProgredir(e)} disabled={progredindo === e.id}>
+                        {progredindo === e.id ? 'Registrando...' : `⬆ Registrar Progressão: ${e.regime_inicial} → ${e.regime_progressao}`}
+                      </button>
+                    )}
 
                     {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
 
