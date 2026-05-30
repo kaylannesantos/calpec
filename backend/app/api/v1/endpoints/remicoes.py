@@ -62,12 +62,12 @@ def registrar_remicao(dados: RemicaoCreate, db: Session = Depends(get_db)):
     # 5. Pena efetiva após remições
     pena_efetiva = pena_base - total_dias_remidos
 
-    # 6. Recalcular data de progressão com base na pena efetiva
+    # 6. Recalcular data de progressão
     percentual = calcular_percentual_progressao(
         execucao.natureza_crime.value,
         execucao.reincidente
     )
-    dias_para_progressao = int(pena_efetiva * percentual)
+    dias_para_progressao = int(pena_base * percentual) - total_dias_remidos
     nova_data_progressao = execucao.data_inicio_pena + timedelta(days=dias_para_progressao)
 
     # 7. Recalcular data de término
