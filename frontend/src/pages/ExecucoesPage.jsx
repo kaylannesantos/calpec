@@ -5,7 +5,7 @@ import { gerarPDFExecucao } from '../utils/gerarPDF'
 import styles from './ExecucoesPage.module.css'
 import { API_URL } from '../services/api'
 
-const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Extinta']
+const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento Condicional', 'Pena Extinta']
 const naturezas = [
   { value: 'comum', label: 'Crime comum (sem violência)' },
   { value: 'violento', label: 'Crime comum (com violência)' },
@@ -19,7 +19,7 @@ const naturezas = [
 function getEtapaIndex(regime) {
   if (!regime) return 0
   if (regime.includes('Semiaberto')) return 1
-  if (regime.includes('Aberto')) return 2
+  if (regime.includes('Aberto') && !regime.includes('Semiaberto')) return 2
   if (regime.includes('Livramento')) return 3
   if (regime.includes('Extinta')) return 4
   return 0
@@ -42,23 +42,25 @@ function calcularDiasFaltantes(dataProgressao) {
 }
 
 function ModalConfirmacao({ execucao, onConfirmar, onCancelar, loading }) {
+  const extinta = execucao.regime_inicial === 'Livramento Condicional'
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modal}>
-        <div className={styles.modalIcone}>⬆</div>
-        <h2 className={styles.modalTitulo}>Registrar Progressão de Regime</h2>
+        <div className={styles.modalIcone}>{extinta ? '🏁' : '⬆'}</div>
+        <h2 className={styles.modalTitulo}>{extinta ? 'Registrar Extinção da Pena' : 'Registrar Progressão de Regime'}</h2>
         <p className={styles.modalTexto}>
-          Confirma a progressão do regime de <strong>{execucao.regime_inicial}</strong> para <strong>{execucao.regime_progressao}</strong>?
+          {extinta
+            ? <>Confirma a <strong>extinção da pena</strong> do apenado? O processo de execução será encerrado.</>
+            : <>Confirma a progressão de <strong>{execucao.regime_inicial}</strong> para <strong>{execucao.regime_progressao}</strong>?</>
+          }
         </p>
         <p className={styles.modalAviso}>
-          Essa ação documenta o deferimento judicial da progressão e não pode ser desfeita.
+          Essa ação documenta o deferimento judicial e não pode ser desfeita.
         </p>
         <div className={styles.modalBotoes}>
-          <button className={styles.modalBtnCancelar} onClick={onCancelar} disabled={loading}>
-            Cancelar
-          </button>
+          <button className={styles.modalBtnCancelar} onClick={onCancelar} disabled={loading}>Cancelar</button>
           <button className={styles.modalBtnConfirmar} onClick={onConfirmar} disabled={loading}>
-            {loading ? 'Registrando...' : 'Confirmar progressão'}
+            {loading ? 'Registrando...' : extinta ? 'Confirmar extinção' : 'Confirmar progressão'}
           </button>
         </div>
       </div>
@@ -231,6 +233,120 @@ function FormRemicao({ execucaoId, onRemicaoAdicionada }) {
   )
 }
 
+function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerandoPDF, setModalProgressao, edicaoAberta, setEdicaoAberta, remicaoAberta, setRemicaoAberta, carregar }) {
+  const pct = calcularProgresso(e)
+  const diasFaltantes = calcularDiasFaltantes(e.data_progressao)
+  const progressaoVencida = diasFaltantes !== null && diasFaltantes < 0
+  const etapaAtual = getEtapaIndex(e.regime_inicial)
+  const extinta = e.regime_inicial === 'Pena Extinta'
+
+  const toggleEdicao = (id) => { setEdicaoAberta(prev => prev === id ? null : id); setRemicaoAberta(null) }
+  const toggleRemicao = (id) => { setRemicaoAberta(prev => prev === id ? null : id); setEdicaoAberta(null) }
+
+  return (
+    <div key={e.id} className={`${styles.card} ${extinta ? styles.cardExtinta : ''}`}>
+      <div className={styles.cardTop}>
+        <div>
+          <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)?.nome || `Apenado #${e.apenado_id}`}</span>
+          <div className={styles.cardTags}>
+            <span className={`${styles.badge} ${
+              extinta ? styles.badgeExtinta :
+              e.regime_inicial === 'Fechado' ? styles.badgeFechado :
+              e.regime_inicial === 'Semiaberto' ? styles.badgeSemiaberto :
+              e.regime_inicial === 'Aberto' ? styles.badgeAberto :
+              e.regime_inicial === 'Livramento Condicional' ? styles.badgeLivramento :
+              styles.badgeFechado
+            }`}>{e.regime_inicial || 'Fechado'}</span>
+            {e.reincidente && <span className={`${styles.badge} ${styles.badgeReincidente}`}>Reincidente</span>}
+            <span className={`${styles.badge} ${styles.badgeNatureza}`}>{e.natureza_crime}</span>
+          </div>
+        </div>
+        <div className={styles.cardAcoes}>
+          <button className={styles.btnPDF} onClick={() => handleGerarPDF(e, true)} disabled={gerandoPDF === e.id}>
+            {gerandoPDF === e.id ? '...' : '👁 Ver'}
+          </button>
+          <button className={styles.btnPDFDownload} onClick={() => handleGerarPDF(e, false)} disabled={gerandoPDF === e.id}>
+            ↓ PDF
+          </button>
+          <span className={styles.cardId}>#{e.id}</span>
+        </div>
+      </div>
+
+      <div className={styles.etapas}>
+        {ETAPAS.map((etapa, i) => (
+          <div key={etapa} className={styles.etapaGrupo}>
+            <div className={styles.etapaItem}>
+              <div className={`${styles.etapaDot} ${i < etapaAtual ? styles.etapaFeita : ''} ${i === etapaAtual ? styles.etapaAtual : ''}`} />
+              <span className={`${styles.etapaLabel} ${i === etapaAtual ? styles.etapaLabelAtiva : ''}`}>{etapa}</span>
+            </div>
+            {i < ETAPAS.length - 1 && <div className={`${styles.etapaLinha} ${i < etapaAtual ? styles.etapaLinhaFeita : ''}`} />}
+          </div>
+        ))}
+      </div>
+
+      {!extinta && (
+        <>
+          <div className={styles.progressoWrap}>
+            <div className={styles.progressoHeader}>
+              <span className={styles.progressoLabel}>Pena cumprida</span>
+              <span className={`${styles.progressoPct} ${progressaoVencida ? styles.progressoPctAlerta : ''}`}>{pct}%</span>
+            </div>
+            <div className={styles.progressoBar}>
+              <div className={`${styles.progressoFill} ${progressaoVencida ? styles.progressoFillAlerta : ''}`} style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+
+          <div className={styles.cardGrid}>
+            <div className={styles.cardInfo}><span className={styles.infoLabel}>Pena total</span><span className={styles.infoValor}>{e.pena_anos}A {e.pena_meses}M {e.pena_dias}D</span></div>
+            <div className={styles.cardInfo}><span className={styles.infoLabel}>Início</span><span className={styles.infoValor}>{formatarData(e.data_inicio_pena)}</span></div>
+            <div className={styles.cardInfo}><span className={styles.infoLabel}>Término</span><span className={styles.infoValor}>{formatarData(e.data_termino)}</span></div>
+            <div className={styles.cardInfo}><span className={styles.infoLabel}>Progressão em</span><span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>{formatarData(e.data_progressao)}</span></div>
+            <div className={styles.cardInfo}><span className={styles.infoLabel}>Dias remidos</span><span className={styles.infoValor}>{e.dias_remidos ?? 0}</span></div>
+            <div className={styles.cardInfo}>
+              <span className={styles.infoLabel}>{progressaoVencida ? 'Vencida há' : 'Falta para progressão'}</span>
+              <span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>
+                {diasFaltantes === null ? '—' : `${Math.abs(diasFaltantes)} dias`}
+              </span>
+            </div>
+          </div>
+
+          {progressaoVencida && (
+            <button className={styles.btnProgredir} onClick={() => setModalProgressao(e)}>
+              ⬆ {e.regime_inicial === 'Livramento Condicional' ? 'Registrar Extinção da Pena' : `Registrar Progressão: ${e.regime_inicial} → ${e.regime_progressao}`}
+            </button>
+          )}
+          {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
+        </>
+      )}
+
+      {extinta && (
+        <div className={styles.extintaBox}>
+          <span>🏁</span>
+          <div>
+            <p className={styles.extintaTitulo}>Pena Extinta</p>
+            <p className={styles.extintaDetalhe}>Início: {formatarData(e.data_inicio_pena)} · Término: {formatarData(e.data_termino)} · {e.dias_remidos ?? 0} dias remidos</p>
+          </div>
+        </div>
+      )}
+
+      {!extinta && (
+        <div className={styles.acoesCard}>
+          <div className={styles.botoesAcoes}>
+            <button className={`${styles.btnEditar} ${edicaoAberta === e.id ? styles.btnAtivoEditar : ''}`} onClick={() => toggleEdicao(e.id)} type="button">
+              {edicaoAberta === e.id ? '▲ Fechar edição' : '✎ Editar execução'}
+            </button>
+            <button className={`${styles.btnRemicao} ${remicaoAberta === e.id ? styles.btnAtivoRemicao : ''}`} onClick={() => toggleRemicao(e.id)} type="button">
+              {remicaoAberta === e.id ? '▲ Fechar' : '+ Registrar Remição'}
+            </button>
+          </div>
+          {edicaoAberta === e.id && <FormEdicao execucao={e} onAtualizado={carregar} onFechar={() => setEdicaoAberta(null)} />}
+          {remicaoAberta === e.id && <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ExecucoesPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
@@ -246,6 +362,7 @@ export default function ExecucoesPage() {
   const [remicaoAberta, setRemicaoAberta] = useState(null)
   const [progredindo, setProgredindo] = useState(null)
   const [modalProgressao, setModalProgressao] = useState(null)
+  const [mostrarHistorico, setMostrarHistorico] = useState(false)
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
@@ -263,9 +380,12 @@ export default function ExecucoesPage() {
 
   useEffect(() => { carregar() }, [])
 
-  const execucoesFiltradas = filtro
+  const todasFiltradas = filtro
     ? execucoes.filter(e => String(e.apenado_id) === String(filtro))
     : execucoes
+
+  const execucoesAtivas = todasFiltradas.filter(e => e.regime_inicial !== 'Pena Extinta')
+  const execucoesExtintas = todasFiltradas.filter(e => e.regime_inicial === 'Pena Extinta')
 
   const getNomeApenado = (id) => apenados.find(a => a.id === id) || null
 
@@ -295,15 +415,7 @@ export default function ExecucoesPage() {
     finally { setProgredindo(null) }
   }
 
-  const toggleEdicao = (id) => {
-    setEdicaoAberta(prev => prev === id ? null : id)
-    setRemicaoAberta(null)
-  }
-
-  const toggleRemicao = (id) => {
-    setRemicaoAberta(prev => prev === id ? null : id)
-    setEdicaoAberta(null)
-  }
+  const propsComuns = { getNomeApenado, formatarData, handleGerarPDF, gerandoPDF, setModalProgressao, edicaoAberta, setEdicaoAberta, remicaoAberta, setRemicaoAberta, carregar }
 
   return (
     <div className={styles.root}>
@@ -324,7 +436,7 @@ export default function ExecucoesPage() {
           <div className={styles.pageHeader}>
             <div>
               <h1 className={styles.title}>{apenadoNome ? `Execuções — ${apenadoNome}` : 'Todas as Execuções'}</h1>
-              <p className={styles.subtitle}>{execucoesFiltradas.length} registro(s)</p>
+              <p className={styles.subtitle}>{execucoesAtivas.length} ativa(s) · {execucoesExtintas.length} extinta(s)</p>
             </div>
             <div className={styles.acoes}>
               {filtro && <button className={styles.btnSecundario} onClick={() => { setFiltro(''); navigate('/execucoes') }}>Ver todas</button>}
@@ -344,111 +456,37 @@ export default function ExecucoesPage() {
 
           <div className={styles.divider} />
 
-          {carregando ? <p className={styles.vazio}>Carregando...</p> : execucoesFiltradas.length === 0 ? (
-            <div className={styles.vazioBox}>
-              <p className={styles.vazio}>Nenhuma execução cadastrada ainda.</p>
-              <button className={styles.btnSecundario} onClick={() => navigate('/execucao')}>Registrar primeira execução</button>
-            </div>
-          ) : (
-            <div className={styles.lista}>
-              {execucoesFiltradas.map(e => {
-                const pct = calcularProgresso(e)
-                const diasFaltantes = calcularDiasFaltantes(e.data_progressao)
-                const progressaoVencida = diasFaltantes !== null && diasFaltantes < 0
-                const etapaAtual = getEtapaIndex(e.regime_inicial)
-
-                return (
-                  <div key={e.id} className={styles.card}>
-                    <div className={styles.cardTop}>
-                      <div>
-                        <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)?.nome || `Apenado #${e.apenado_id}`}</span>
-                        <div className={styles.cardTags}>
-                          <span className={`${styles.badge} ${
-                            e.regime_inicial === 'Fechado' ? styles.badgeFechado :
-                            e.regime_inicial === 'Semiaberto' ? styles.badgeSemiaberto :
-                            e.regime_inicial === 'Aberto' ? styles.badgeAberto : styles.badgeFechado
-                          }`}>{e.regime_inicial || 'Fechado'}</span>
-                          {e.reincidente && <span className={`${styles.badge} ${styles.badgeReincidente}`}>Reincidente</span>}
-                          <span className={`${styles.badge} ${styles.badgeNatureza}`}>{e.natureza_crime}</span>
-                        </div>
+          {carregando ? <p className={styles.vazio}>Carregando...</p> : (
+            <>
+              {execucoesAtivas.length === 0 && execucoesExtintas.length === 0 ? (
+                <div className={styles.vazioBox}>
+                  <p className={styles.vazio}>Nenhuma execução cadastrada ainda.</p>
+                  <button className={styles.btnSecundario} onClick={() => navigate('/execucao')}>Registrar primeira execução</button>
+                </div>
+              ) : (
+                <>
+                  {execucoesAtivas.length === 0
+                    ? <p className={styles.vazio}>Nenhuma execução ativa.</p>
+                    : <div className={styles.lista}>
+                        {execucoesAtivas.map(e => <CardExecucao key={e.id} e={e} {...propsComuns} />)}
                       </div>
-                      <div className={styles.cardAcoes}>
-                        <button className={styles.btnPDF} onClick={() => handleGerarPDF(e, true)} disabled={gerandoPDF === e.id}>
-                          {gerandoPDF === e.id ? '...' : '👁 Ver'}
-                        </button>
-                        <button className={styles.btnPDFDownload} onClick={() => handleGerarPDF(e, false)} disabled={gerandoPDF === e.id}>
-                          ↓ PDF
-                        </button>
-                        <span className={styles.cardId}>#{e.id}</span>
-                      </div>
-                    </div>
+                  }
 
-                    <div className={styles.etapas}>
-                      {ETAPAS.map((etapa, i) => (
-                        <div key={etapa} className={styles.etapaGrupo}>
-                          <div className={styles.etapaItem}>
-                            <div className={`${styles.etapaDot} ${i < etapaAtual ? styles.etapaFeita : ''} ${i === etapaAtual ? styles.etapaAtual : ''}`} />
-                            <span className={`${styles.etapaLabel} ${i === etapaAtual ? styles.etapaLabelAtiva : ''}`}>{etapa}</span>
-                          </div>
-                          {i < ETAPAS.length - 1 && <div className={`${styles.etapaLinha} ${i < etapaAtual ? styles.etapaLinhaFeita : ''}`} />}
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className={styles.progressoWrap}>
-                      <div className={styles.progressoHeader}>
-                        <span className={styles.progressoLabel}>Pena cumprida</span>
-                        <span className={`${styles.progressoPct} ${progressaoVencida ? styles.progressoPctAlerta : ''}`}>{pct}%</span>
-                      </div>
-                      <div className={styles.progressoBar}>
-                        <div className={`${styles.progressoFill} ${progressaoVencida ? styles.progressoFillAlerta : ''}`} style={{ width: `${pct}%` }} />
-                      </div>
-                    </div>
-
-                    <div className={styles.cardGrid}>
-                      <div className={styles.cardInfo}><span className={styles.infoLabel}>Pena total</span><span className={styles.infoValor}>{e.pena_anos}A {e.pena_meses}M {e.pena_dias}D</span></div>
-                      <div className={styles.cardInfo}><span className={styles.infoLabel}>Início</span><span className={styles.infoValor}>{formatarData(e.data_inicio_pena)}</span></div>
-                      <div className={styles.cardInfo}><span className={styles.infoLabel}>Término</span><span className={styles.infoValor}>{formatarData(e.data_termino)}</span></div>
-                      <div className={styles.cardInfo}><span className={styles.infoLabel}>Progressão em</span><span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>{formatarData(e.data_progressao)}</span></div>
-                      <div className={styles.cardInfo}><span className={styles.infoLabel}>Dias remidos</span><span className={styles.infoValor}>{e.dias_remidos ?? 0}</span></div>
-                      <div className={styles.cardInfo}>
-                        <span className={styles.infoLabel}>{progressaoVencida ? 'Vencida há' : 'Falta para progressão'}</span>
-                        <span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>
-                          {diasFaltantes === null ? '—' : `${Math.abs(diasFaltantes)} dias`}
-                        </span>
-                      </div>
-                    </div>
-
-                    {progressaoVencida && e.regime_inicial !== 'Livramento Condicional' && e.regime_inicial !== 'Pena Extinta' && (
-                      <button className={styles.btnProgredir} onClick={() => setModalProgressao(e)}>
-                        ⬆ Registrar Progressão: {e.regime_inicial} → {e.regime_progressao}
+                  {execucoesExtintas.length > 0 && (
+                    <div className={styles.historicoSecao}>
+                      <button className={styles.historicoToggle} onClick={() => setMostrarHistorico(!mostrarHistorico)}>
+                        {mostrarHistorico ? '▲' : '▼'} Histórico — Penas Extintas ({execucoesExtintas.length})
                       </button>
-                    )}
-
-                    {progressaoVencida && (
-                      <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>
-                    )}
-
-                    <div className={styles.acoesCard}>
-                      <div className={styles.botoesAcoes}>
-                        <button className={`${styles.btnEditar} ${edicaoAberta === e.id ? styles.btnAtivoEditar : ''}`} onClick={() => toggleEdicao(e.id)} type="button">
-                          {edicaoAberta === e.id ? '▲ Fechar edição' : '✎ Editar execução'}
-                        </button>
-                        <button className={`${styles.btnRemicao} ${remicaoAberta === e.id ? styles.btnAtivoRemicao : ''}`} onClick={() => toggleRemicao(e.id)} type="button">
-                          {remicaoAberta === e.id ? '▲ Fechar' : '+ Registrar Remição'}
-                        </button>
-                      </div>
-                      {edicaoAberta === e.id && (
-                        <FormEdicao execucao={e} onAtualizado={carregar} onFechar={() => setEdicaoAberta(null)} />
-                      )}
-                      {remicaoAberta === e.id && (
-                        <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />
+                      {mostrarHistorico && (
+                        <div className={styles.lista} style={{marginTop: '12px'}}>
+                          {execucoesExtintas.map(e => <CardExecucao key={e.id} e={e} {...propsComuns} />)}
+                        </div>
                       )}
                     </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
       </div>
