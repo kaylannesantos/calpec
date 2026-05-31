@@ -6,6 +6,14 @@ import styles from './ExecucoesPage.module.css'
 import { API_URL } from '../services/api'
 
 const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento Condicional', 'Pena Extinta']
+const FILTROS = [
+  { valor: 'todos', label: 'Todos', classe: 'chipTodos' },
+  { valor: 'Fechado', label: 'Fechado', classe: 'chipFechado' },
+  { valor: 'Semiaberto', label: 'Semiaberto', classe: 'chipSemi' },
+  { valor: 'Aberto', label: 'Aberto', classe: 'chipAberto' },
+  { valor: 'Livramento Condicional', label: 'Livramento', classe: 'chipLivramento' },
+  { valor: 'Pena Extinta', label: 'Pena Extinta', classe: 'chipExtinta' },
+]
 const naturezas = [
   { value: 'comum', label: 'Crime comum (sem violência)' },
   { value: 'violento', label: 'Crime comum (com violência)' },
@@ -50,13 +58,11 @@ function ModalConfirmacao({ execucao, onConfirmar, onCancelar, loading }) {
         <h2 className={styles.modalTitulo}>{extinta ? 'Registrar Extinção da Pena' : 'Registrar Progressão de Regime'}</h2>
         <p className={styles.modalTexto}>
           {extinta
-            ? <>Confirma a <strong>extinção da pena</strong> do apenado? O processo de execução será encerrado.</>
+            ? <>Confirma a <strong>extinção da pena</strong> do apenado?</>
             : <>Confirma a progressão de <strong>{execucao.regime_inicial}</strong> para <strong>{execucao.regime_progressao}</strong>?</>
           }
         </p>
-        <p className={styles.modalAviso}>
-          Essa ação documenta o deferimento judicial e não pode ser desfeita.
-        </p>
+        <p className={styles.modalAviso}>Essa ação documenta o deferimento judicial e não pode ser desfeita.</p>
         <div className={styles.modalBotoes}>
           <button className={styles.modalBtnCancelar} onClick={onCancelar} disabled={loading}>Cancelar</button>
           <button className={styles.modalBtnConfirmar} onClick={onConfirmar} disabled={loading}>
@@ -233,21 +239,28 @@ function FormRemicao({ execucaoId, onRemicaoAdicionada }) {
   )
 }
 
-function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerandoPDF, setModalProgressao, edicaoAberta, setEdicaoAberta, remicaoAberta, setRemicaoAberta, carregar }) {
+function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerandoPDF, setModalProgressao, carregar }) {
+  const [aberto, setAberto] = useState(false)
+  const [edicaoAberta, setEdicaoAberta] = useState(false)
+  const [remicaoAberta, setRemicaoAberta] = useState(false)
+
   const pct = calcularProgresso(e)
   const diasFaltantes = calcularDiasFaltantes(e.data_progressao)
   const progressaoVencida = diasFaltantes !== null && diasFaltantes < 0
   const etapaAtual = getEtapaIndex(e.regime_inicial)
   const extinta = e.regime_inicial === 'Pena Extinta'
 
-  const toggleEdicao = (id) => { setEdicaoAberta(prev => prev === id ? null : id); setRemicaoAberta(null) }
-  const toggleRemicao = (id) => { setRemicaoAberta(prev => prev === id ? null : id); setEdicaoAberta(null) }
+  const toggleEdicao = () => { setEdicaoAberta(p => !p); setRemicaoAberta(false) }
+  const toggleRemicao = () => { setRemicaoAberta(p => !p); setEdicaoAberta(false) }
 
   return (
-    <div key={e.id} className={`${styles.card} ${extinta ? styles.cardExtinta : ''}`}>
-      <div className={styles.cardTop}>
+    <div className={`${styles.card} ${extinta ? styles.cardExtinta : ''} ${aberto ? styles.cardAberto : ''}`}>
+      <div className={styles.cardTop} onClick={() => setAberto(p => !p)} style={{cursor: 'pointer'}}>
         <div>
-          <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)?.nome || `Apenado #${e.apenado_id}`}</span>
+          <div className={styles.cardNomeRow}>
+            <span className={styles.cardNome}>{getNomeApenado(e.apenado_id)?.nome || `Apenado #${e.apenado_id}`}</span>
+            <span className={styles.cardToggle}>{aberto ? '▲' : '▼'}</span>
+          </div>
           <div className={styles.cardTags}>
             <span className={`${styles.badge} ${
               extinta ? styles.badgeExtinta :
@@ -261,7 +274,7 @@ function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerando
             <span className={`${styles.badge} ${styles.badgeNatureza}`}>{e.natureza_crime}</span>
           </div>
         </div>
-        <div className={styles.cardAcoes}>
+        <div className={styles.cardAcoes} onClick={ev => ev.stopPropagation()}>
           <button className={styles.btnPDF} onClick={() => handleGerarPDF(e, true)} disabled={gerandoPDF === e.id}>
             {gerandoPDF === e.id ? '...' : '👁 Ver'}
           </button>
@@ -272,75 +285,77 @@ function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerando
         </div>
       </div>
 
-      <div className={styles.etapas}>
-        {ETAPAS.map((etapa, i) => (
-          <div key={etapa} className={styles.etapaGrupo}>
-            <div className={styles.etapaItem}>
-              <div className={`${styles.etapaDot} ${i < etapaAtual ? styles.etapaFeita : ''} ${i === etapaAtual ? styles.etapaAtual : ''}`} />
-              <span className={`${styles.etapaLabel} ${i === etapaAtual ? styles.etapaLabelAtiva : ''}`}>{etapa}</span>
-            </div>
-            {i < ETAPAS.length - 1 && <div className={`${styles.etapaLinha} ${i < etapaAtual ? styles.etapaLinhaFeita : ''}`} />}
-          </div>
-        ))}
-      </div>
-
-      {!extinta && (
-        <>
-          <div className={styles.progressoWrap}>
-            <div className={styles.progressoHeader}>
-              <span className={styles.progressoLabel}>Pena cumprida</span>
-              <span className={`${styles.progressoPct} ${progressaoVencida ? styles.progressoPctAlerta : ''}`}>{pct}%</span>
-            </div>
-            <div className={styles.progressoBar}>
-              <div className={`${styles.progressoFill} ${progressaoVencida ? styles.progressoFillAlerta : ''}`} style={{ width: `${pct}%` }} />
-            </div>
+      {aberto && (
+        <div className={styles.cardDetalhe}>
+          <div className={styles.etapas}>
+            {ETAPAS.map((etapa, i) => (
+              <div key={etapa} className={styles.etapaGrupo}>
+                <div className={styles.etapaItem}>
+                  <div className={`${styles.etapaDot} ${i < etapaAtual ? styles.etapaFeita : ''} ${i === etapaAtual ? styles.etapaAtual : ''}`} />
+                  <span className={`${styles.etapaLabel} ${i === etapaAtual ? styles.etapaLabelAtiva : ''}`}>{etapa}</span>
+                </div>
+                {i < ETAPAS.length - 1 && <div className={`${styles.etapaLinha} ${i < etapaAtual ? styles.etapaLinhaFeita : ''}`} />}
+              </div>
+            ))}
           </div>
 
-          <div className={styles.cardGrid}>
-            <div className={styles.cardInfo}><span className={styles.infoLabel}>Pena total</span><span className={styles.infoValor}>{e.pena_anos}A {e.pena_meses}M {e.pena_dias}D</span></div>
-            <div className={styles.cardInfo}><span className={styles.infoLabel}>Início</span><span className={styles.infoValor}>{formatarData(e.data_inicio_pena)}</span></div>
-            <div className={styles.cardInfo}><span className={styles.infoLabel}>Término</span><span className={styles.infoValor}>{formatarData(e.data_termino)}</span></div>
-            <div className={styles.cardInfo}><span className={styles.infoLabel}>Progressão em</span><span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>{formatarData(e.data_progressao)}</span></div>
-            <div className={styles.cardInfo}><span className={styles.infoLabel}>Dias remidos</span><span className={styles.infoValor}>{e.dias_remidos ?? 0}</span></div>
-            <div className={styles.cardInfo}>
-              <span className={styles.infoLabel}>{progressaoVencida ? 'Vencida há' : 'Falta para progressão'}</span>
-              <span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>
-                {diasFaltantes === null ? '—' : `${Math.abs(diasFaltantes)} dias`}
-              </span>
-            </div>
-          </div>
+          {!extinta && (
+            <>
+              <div className={styles.progressoWrap}>
+                <div className={styles.progressoHeader}>
+                  <span className={styles.progressoLabel}>Pena cumprida</span>
+                  <span className={`${styles.progressoPct} ${progressaoVencida ? styles.progressoPctAlerta : ''}`}>{pct}%</span>
+                </div>
+                <div className={styles.progressoBar}>
+                  <div className={`${styles.progressoFill} ${progressaoVencida ? styles.progressoFillAlerta : ''}`} style={{ width: `${pct}%` }} />
+                </div>
+              </div>
 
-          {progressaoVencida && (
-            <button className={styles.btnProgredir} onClick={() => setModalProgressao(e)}>
-              ⬆ {e.regime_inicial === 'Livramento Condicional' ? 'Registrar Extinção da Pena' : `Registrar Progressão: ${e.regime_inicial} → ${e.regime_progressao}`}
-            </button>
+              <div className={styles.cardGrid}>
+                <div className={styles.cardInfo}><span className={styles.infoLabel}>Pena total</span><span className={styles.infoValor}>{e.pena_anos}A {e.pena_meses}M {e.pena_dias}D</span></div>
+                <div className={styles.cardInfo}><span className={styles.infoLabel}>Início</span><span className={styles.infoValor}>{formatarData(e.data_inicio_pena)}</span></div>
+                <div className={styles.cardInfo}><span className={styles.infoLabel}>Término</span><span className={styles.infoValor}>{formatarData(e.data_termino)}</span></div>
+                <div className={styles.cardInfo}><span className={styles.infoLabel}>Progressão em</span><span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>{formatarData(e.data_progressao)}</span></div>
+                <div className={styles.cardInfo}><span className={styles.infoLabel}>Dias remidos</span><span className={styles.infoValor}>{e.dias_remidos ?? 0}</span></div>
+                <div className={styles.cardInfo}>
+                  <span className={styles.infoLabel}>{progressaoVencida ? 'Vencida há' : 'Falta para progressão'}</span>
+                  <span className={`${styles.infoValor} ${progressaoVencida ? styles.infoAlerta : ''}`}>
+                    {diasFaltantes === null ? '—' : `${Math.abs(diasFaltantes)} dias`}
+                  </span>
+                </div>
+              </div>
+
+              {progressaoVencida && (
+                <button className={styles.btnProgredir} onClick={() => setModalProgressao(e)}>
+                  ⬆ {e.regime_inicial === 'Livramento Condicional' ? 'Registrar Extinção da Pena' : `Registrar Progressão: ${e.regime_inicial} → ${e.regime_progressao}`}
+                </button>
+              )}
+              {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
+
+              <div className={styles.acoesCard}>
+                <div className={styles.botoesAcoes}>
+                  <button className={`${styles.btnEditar} ${edicaoAberta ? styles.btnAtivoEditar : ''}`} onClick={toggleEdicao} type="button">
+                    {edicaoAberta ? '▲ Fechar edição' : '✎ Editar execução'}
+                  </button>
+                  <button className={`${styles.btnRemicao} ${remicaoAberta ? styles.btnAtivoRemicao : ''}`} onClick={toggleRemicao} type="button">
+                    {remicaoAberta ? '▲ Fechar' : '+ Registrar Remição'}
+                  </button>
+                </div>
+                {edicaoAberta && <FormEdicao execucao={e} onAtualizado={carregar} onFechar={() => setEdicaoAberta(false)} />}
+                {remicaoAberta && <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />}
+              </div>
+            </>
           )}
-          {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
-        </>
-      )}
 
-      {extinta && (
-        <div className={styles.extintaBox}>
-          <span>🏁</span>
-          <div>
-            <p className={styles.extintaTitulo}>Pena Extinta</p>
-            <p className={styles.extintaDetalhe}>Início: {formatarData(e.data_inicio_pena)} · Término: {formatarData(e.data_termino)} · {e.dias_remidos ?? 0} dias remidos</p>
-          </div>
-        </div>
-      )}
-
-      {!extinta && (
-        <div className={styles.acoesCard}>
-          <div className={styles.botoesAcoes}>
-            <button className={`${styles.btnEditar} ${edicaoAberta === e.id ? styles.btnAtivoEditar : ''}`} onClick={() => toggleEdicao(e.id)} type="button">
-              {edicaoAberta === e.id ? '▲ Fechar edição' : '✎ Editar execução'}
-            </button>
-            <button className={`${styles.btnRemicao} ${remicaoAberta === e.id ? styles.btnAtivoRemicao : ''}`} onClick={() => toggleRemicao(e.id)} type="button">
-              {remicaoAberta === e.id ? '▲ Fechar' : '+ Registrar Remição'}
-            </button>
-          </div>
-          {edicaoAberta === e.id && <FormEdicao execucao={e} onAtualizado={carregar} onFechar={() => setEdicaoAberta(null)} />}
-          {remicaoAberta === e.id && <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />}
+          {extinta && (
+            <div className={styles.extintaBox}>
+              <span>🏁</span>
+              <div>
+                <p className={styles.extintaTitulo}>Pena Extinta</p>
+                <p className={styles.extintaDetalhe}>Início: {formatarData(e.data_inicio_pena)} · Término: {formatarData(e.data_termino)} · {e.dias_remidos ?? 0} dias remidos</p>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -355,14 +370,12 @@ export default function ExecucoesPage() {
 
   const [execucoes, setExecucoes] = useState([])
   const [carregando, setCarregando] = useState(true)
-  const [filtro, setFiltro] = useState(apenadoId || '')
+  const [filtroApenado, setFiltroApenado] = useState(apenadoId || '')
+  const [filtroRegime, setFiltroRegime] = useState('todos')
   const [apenados, setApenados] = useState([])
   const [gerandoPDF, setGerandoPDF] = useState(null)
-  const [edicaoAberta, setEdicaoAberta] = useState(null)
-  const [remicaoAberta, setRemicaoAberta] = useState(null)
   const [progredindo, setProgredindo] = useState(null)
   const [modalProgressao, setModalProgressao] = useState(null)
-  const [mostrarHistorico, setMostrarHistorico] = useState(false)
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
@@ -380,14 +393,11 @@ export default function ExecucoesPage() {
 
   useEffect(() => { carregar() }, [])
 
-  const todasFiltradas = filtro
-    ? execucoes.filter(e => String(e.apenado_id) === String(filtro))
-    : execucoes
-
-  const execucoesAtivas = todasFiltradas.filter(e => e.regime_inicial !== 'Pena Extinta')
-  const execucoesExtintas = todasFiltradas.filter(e => e.regime_inicial === 'Pena Extinta')
-
   const getNomeApenado = (id) => apenados.find(a => a.id === id) || null
+
+  const execucoesFiltradas = execucoes
+    .filter(e => !filtroApenado || String(e.apenado_id) === String(filtroApenado))
+    .filter(e => filtroRegime === 'todos' || e.regime_inicial === filtroRegime)
 
   const handleGerarPDF = async (execucao, visualizar = false) => {
     setGerandoPDF(execucao.id)
@@ -415,7 +425,11 @@ export default function ExecucoesPage() {
     finally { setProgredindo(null) }
   }
 
-  const propsComuns = { getNomeApenado, formatarData, handleGerarPDF, gerandoPDF, setModalProgressao, edicaoAberta, setEdicaoAberta, remicaoAberta, setRemicaoAberta, carregar }
+  const contagem = FILTROS.reduce((acc, f) => {
+    if (f.valor === 'todos') acc[f.valor] = execucoes.filter(e => !filtroApenado || String(e.apenado_id) === String(filtroApenado)).length
+    else acc[f.valor] = execucoes.filter(e => (!filtroApenado || String(e.apenado_id) === String(filtroApenado)) && e.regime_inicial === f.valor).length
+    return acc
+  }, {})
 
   return (
     <div className={styles.root}>
@@ -436,57 +450,58 @@ export default function ExecucoesPage() {
           <div className={styles.pageHeader}>
             <div>
               <h1 className={styles.title}>{apenadoNome ? `Execuções — ${apenadoNome}` : 'Todas as Execuções'}</h1>
-              <p className={styles.subtitle}>{execucoesAtivas.length} ativa(s) · {execucoesExtintas.length} extinta(s)</p>
+              <p className={styles.subtitle}>{execucoesFiltradas.length} resultado(s)</p>
             </div>
             <div className={styles.acoes}>
-              {filtro && <button className={styles.btnSecundario} onClick={() => { setFiltro(''); navigate('/execucoes') }}>Ver todas</button>}
+              {filtroApenado && <button className={styles.btnSecundario} onClick={() => { setFiltroApenado(''); navigate('/execucoes') }}>Ver todas</button>}
               <button className={styles.btnPrimario} onClick={() => navigate('/execucao')}>+ Nova execução</button>
             </div>
           </div>
 
           {apenados.length > 0 && (
             <div className={styles.filtroBar}>
-              <label className={styles.filtroLabel}>Filtrar por apenado:</label>
-              <select className={styles.filtroSelect} value={filtro} onChange={e => setFiltro(e.target.value)}>
+              <label className={styles.filtroLabel}>Apenado:</label>
+              <select className={styles.filtroSelect} value={filtroApenado} onChange={e => setFiltroApenado(e.target.value)}>
                 <option value="">Todos</option>
                 {apenados.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
               </select>
             </div>
           )}
 
+          <div className={styles.chipsBar}>
+            {FILTROS.map(f => (
+              <button
+                key={f.valor}
+                className={`${styles.chip} ${styles[f.classe]} ${filtroRegime === f.valor ? styles.chipAtivo : ''}`}
+                onClick={() => setFiltroRegime(f.valor)}
+              >
+                {f.label} {contagem[f.valor] > 0 && <span className={styles.chipCount}>{contagem[f.valor]}</span>}
+              </button>
+            ))}
+          </div>
+
           <div className={styles.divider} />
 
-          {carregando ? <p className={styles.vazio}>Carregando...</p> : (
-            <>
-              {execucoesAtivas.length === 0 && execucoesExtintas.length === 0 ? (
-                <div className={styles.vazioBox}>
-                  <p className={styles.vazio}>Nenhuma execução cadastrada ainda.</p>
-                  <button className={styles.btnSecundario} onClick={() => navigate('/execucao')}>Registrar primeira execução</button>
-                </div>
-              ) : (
-                <>
-                  {execucoesAtivas.length === 0
-                    ? <p className={styles.vazio}>Nenhuma execução ativa.</p>
-                    : <div className={styles.lista}>
-                        {execucoesAtivas.map(e => <CardExecucao key={e.id} e={e} {...propsComuns} />)}
-                      </div>
-                  }
-
-                  {execucoesExtintas.length > 0 && (
-                    <div className={styles.historicoSecao}>
-                      <button className={styles.historicoToggle} onClick={() => setMostrarHistorico(!mostrarHistorico)}>
-                        {mostrarHistorico ? '▲' : '▼'} Histórico — Penas Extintas ({execucoesExtintas.length})
-                      </button>
-                      {mostrarHistorico && (
-                        <div className={styles.lista} style={{marginTop: '12px'}}>
-                          {execucoesExtintas.map(e => <CardExecucao key={e.id} e={e} {...propsComuns} />)}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </>
+          {carregando ? <p className={styles.vazio}>Carregando...</p> : execucoesFiltradas.length === 0 ? (
+            <div className={styles.vazioBox}>
+              <p className={styles.vazio}>Nenhuma execução encontrada.</p>
+              {filtroRegime !== 'todos' && <button className={styles.btnSecundario} onClick={() => setFiltroRegime('todos')}>Ver todas</button>}
+            </div>
+          ) : (
+            <div className={styles.lista}>
+              {execucoesFiltradas.map(e => (
+                <CardExecucao
+                  key={e.id}
+                  e={e}
+                  getNomeApenado={getNomeApenado}
+                  formatarData={formatarData}
+                  handleGerarPDF={handleGerarPDF}
+                  gerandoPDF={gerandoPDF}
+                  setModalProgressao={setModalProgressao}
+                  carregar={carregar}
+                />
+              ))}
+            </div>
           )}
         </div>
       </div>

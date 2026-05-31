@@ -10,27 +10,45 @@
 .btnPrimario:hover { background: #d4b87a; }
 .btnSecundario { background: transparent; border: 0.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .btnSecundario:hover { border-color: #c9a96e; color: #c9a96e; }
-.filtroBar { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.filtroBar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
 .filtroLabel { font-size: 12px; color: rgba(255,255,255,0.4); white-space: nowrap; }
 .filtroSelect { background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: #e8dcc8; outline: none; cursor: pointer; }
 .filtroSelect option { background: #1a2633; }
+.chipsBar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 0.5px solid; transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; }
+.chipCount { font-size: 11px; opacity: 0.7; }
+.chipTodos { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.4); background: transparent; }
+.chipTodos.chipAtivo { border-color: rgba(255,255,255,0.5); color: #e8dcc8; background: rgba(255,255,255,0.08); }
+.chipFechado { border-color: rgba(201,169,110,0.4); color: #c9a96e; background: transparent; }
+.chipFechado.chipAtivo { background: rgba(201,169,110,0.12); }
+.chipSemi { border-color: rgba(255,209,102,0.4); color: #ffd166; background: transparent; }
+.chipSemi.chipAtivo { background: rgba(255,209,102,0.1); }
+.chipAberto { border-color: rgba(126,200,138,0.4); color: #7ec88a; background: transparent; }
+.chipAberto.chipAtivo { background: rgba(126,200,138,0.1); }
+.chipLivramento { border-color: rgba(100,180,255,0.4); color: #64b4ff; background: transparent; }
+.chipLivramento.chipAtivo { background: rgba(100,180,255,0.1); }
+.chipExtinta { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); background: transparent; }
+.chipExtinta.chipAtivo { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.6); }
 .divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 20px; }
-.lista { display: flex; flex-direction: column; gap: 16px; }
-.card { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 24px; transition: border-color 0.2s; }
-.card:hover { border-color: rgba(201,169,110,0.25); }
-.cardExtinta { opacity: 0.7; border-color: rgba(255,255,255,0.05) !important; }
-.cardTop { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-.cardNome { font-size: 15px; font-weight: 500; color: #e8dcc8; display: block; margin-bottom: 8px; }
+.lista { display: flex; flex-direction: column; gap: 10px; }
+.card { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px 20px; transition: border-color 0.2s; }
+.card:hover { border-color: rgba(201,169,110,0.2); }
+.cardAberto { border-color: rgba(201,169,110,0.3) !important; }
+.cardExtinta { opacity: 0.65; }
+.cardTop { display: flex; justify-content: space-between; align-items: flex-start; }
+.cardNomeRow { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.cardNome { font-size: 14px; font-weight: 500; color: #e8dcc8; }
+.cardToggle { font-size: 11px; color: rgba(255,255,255,0.25); }
 .cardTags { display: flex; gap: 6px; flex-wrap: wrap; }
 .cardAcoes { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .cardId { font-size: 12px; color: rgba(255,255,255,0.2); }
+.cardDetalhe { margin-top: 16px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 16px; }
 .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
 .badgeFechado { background: rgba(201,169,110,0.12); color: #c9a96e; }
 .badgeSemiaberto { background: rgba(255,209,102,0.12); color: #ffd166; }
 .badgeAberto { background: rgba(126,200,138,0.12); color: #7ec88a; }
 .badgeLivramento { background: rgba(100,180,255,0.12); color: #64b4ff; }
 .badgeExtinta { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
-.badgeAlerta { background: rgba(255,209,102,0.12); color: #ffd166; }
 .badgeReincidente { background: rgba(240,128,128,0.1); color: #f08080; }
 .badgeNatureza { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.4); }
 .btnPDF { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 7px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
@@ -39,43 +57,39 @@
 .btnPDFDownload { background: #c9a96e; border: none; border-radius: 7px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: #0f1923; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .btnPDFDownload:hover { background: #d4b87a; }
 .btnPDFDownload:disabled { opacity: 0.5; cursor: not-allowed; }
-.etapas { display: flex; align-items: flex-start; margin-bottom: 18px; }
+.etapas { display: flex; align-items: flex-start; margin-bottom: 16px; }
 .etapaGrupo { display: flex; align-items: center; flex: 1; }
 .etapaGrupo:last-child { flex: 0; }
 .etapaItem { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-.etapaDot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; flex-shrink: 0; }
+.etapaDot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.15); background: transparent; flex-shrink: 0; }
 .etapaFeita { background: #c9a96e; border-color: #c9a96e; }
 .etapaAtual { background: #c9a96e; border-color: #c9a96e; box-shadow: 0 0 0 3px rgba(201,169,110,0.2); }
 .etapaLabel { font-size: 9px; color: rgba(255,255,255,0.3); text-align: center; white-space: nowrap; }
 .etapaLabelAtiva { color: #c9a96e; }
-.etapaLinha { flex: 1; height: 1px; background: rgba(255,255,255,0.08); margin: 0 4px; margin-bottom: 16px; }
+.etapaLinha { flex: 1; height: 1px; background: rgba(255,255,255,0.08); margin: 0 4px; margin-bottom: 14px; }
 .etapaLinhaFeita { background: #c9a96e; }
-.progressoWrap { margin-bottom: 16px; }
-.progressoHeader { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.progressoWrap { margin-bottom: 14px; }
+.progressoHeader { display: flex; justify-content: space-between; margin-bottom: 5px; }
 .progressoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
 .progressoPct { font-size: 12px; color: #c9a96e; font-weight: 500; }
 .progressoPctAlerta { color: #ffd166; }
 .progressoBar { height: 5px; background: rgba(255,255,255,0.06); border-radius: 3px; overflow: hidden; }
 .progressoFill { height: 100%; border-radius: 3px; background: #c9a96e; transition: width 0.4s; }
 .progressoFillAlerta { background: #ffd166; }
-.cardGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.cardGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
 .cardInfo { display: flex; flex-direction: column; gap: 3px; }
 .infoLabel { font-size: 11px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
 .infoValor { font-size: 13px; color: #e8dcc8; font-weight: 500; }
 .infoAlerta { color: #ffd166; }
-.alertaBox { margin-top: 14px; font-size: 12px; color: #ffd166; background: rgba(255,209,102,0.06); border: 0.5px solid rgba(255,209,102,0.2); border-radius: 8px; padding: 8px 14px; }
+.alertaBox { margin-top: 12px; font-size: 12px; color: #ffd166; background: rgba(255,209,102,0.06); border: 0.5px solid rgba(255,209,102,0.2); border-radius: 8px; padding: 8px 14px; }
 .vazioBox { text-align: center; padding: 48px 24px; }
 .vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
-.extintaBox { display: flex; align-items: center; gap: 14px; padding: 12px 0; }
+.extintaBox { display: flex; align-items: center; gap: 14px; padding: 8px 0; }
 .extintaTitulo { font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
 .extintaDetalhe { font-size: 12px; color: rgba(255,255,255,0.3); }
-.historicoSecao { margin-top: 24px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 16px; }
-.historicoToggle { background: transparent; border: 0.5px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); border-radius: 8px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; width: 100%; text-align: left; }
-.historicoToggle:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); }
 .btnProgredir { width: 100%; margin-top: 12px; background: rgba(126,200,138,0.1); border: 0.5px solid #7ec88a; color: #7ec88a; border-radius: 8px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
 .btnProgredir:hover { background: rgba(126,200,138,0.2); }
-.btnProgredir:disabled { opacity: 0.5; cursor: not-allowed; }
-.acoesCard { margin-top: 16px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 14px; display: flex; flex-direction: column; gap: 12px; }
+.acoesCard { margin-top: 14px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 12px; display: flex; flex-direction: column; gap: 12px; }
 .botoesAcoes { display: flex; gap: 10px; }
 .btnEditar { flex: 1; background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; }
 .btnEditar:hover { border-color: #c9a96e; color: #c9a96e; }
