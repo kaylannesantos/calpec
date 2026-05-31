@@ -246,16 +246,16 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
 // ─── VISUALIZAR OU BAIXAR ────────────────────────────
   const nomeArquivo = `CalPEC_${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
   if (visualizar) {
-    const blob = doc.output('blob')
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.target = '_blank'
-    a.download = nomeArquivo
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+    const url = doc.output('bloburl')
+    const win = window.open('', '_blank')
+    win.document.write(`
+      <html>
+        <head><title>${nomeArquivo}</title></head>
+        <body style="margin:0">
+          <embed src="${url}" type="application/pdf" width="100%" height="100%" />
+        </body>
+      </html>
+    `)
   } else {
     doc.save(nomeArquivo)
   }
