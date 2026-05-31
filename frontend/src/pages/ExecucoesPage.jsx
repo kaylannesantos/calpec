@@ -41,6 +41,31 @@ function calcularDiasFaltantes(dataProgressao) {
   return Math.ceil((prog - hoje) / (1000 * 60 * 60 * 24))
 }
 
+function ModalConfirmacao({ execucao, onConfirmar, onCancelar, loading }) {
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modal}>
+        <div className={styles.modalIcone}>⬆</div>
+        <h2 className={styles.modalTitulo}>Registrar Progressão de Regime</h2>
+        <p className={styles.modalTexto}>
+          Confirma a progressão do regime de <strong>{execucao.regime_inicial}</strong> para <strong>{execucao.regime_progressao}</strong>?
+        </p>
+        <p className={styles.modalAviso}>
+          Essa ação documenta o deferimento judicial da progressão e não pode ser desfeita.
+        </p>
+        <div className={styles.modalBotoes}>
+          <button className={styles.modalBtnCancelar} onClick={onCancelar} disabled={loading}>
+            Cancelar
+          </button>
+          <button className={styles.modalBtnConfirmar} onClick={onConfirmar} disabled={loading}>
+            {loading ? 'Registrando...' : 'Confirmar progressão'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function FormEdicao({ execucao, onAtualizado, onFechar }) {
   const [form, setForm] = useState({
     pena_anos: execucao.pena_anos, pena_meses: execucao.pena_meses, pena_dias: execucao.pena_dias,
@@ -120,7 +145,7 @@ function FormEdicao({ execucao, onAtualizado, onFechar }) {
   )
 }
 
-function FormRemicao({ execucaoId, onRemicaoAdicionada, onFechar }) {
+function FormRemicao({ execucaoId, onRemicaoAdicionada }) {
   const [historico, setHistorico] = useState([])
   const [form, setForm] = useState({ tipo: 'trabalho', quantidade: '', data_referencia: '', observacao: '' })
   const [loading, setLoading] = useState(false)
@@ -220,6 +245,7 @@ export default function ExecucoesPage() {
   const [edicaoAberta, setEdicaoAberta] = useState(null)
   const [remicaoAberta, setRemicaoAberta] = useState(null)
   const [progredindo, setProgredindo] = useState(null)
+  const [modalProgressao, setModalProgressao] = useState(null)
 
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
@@ -255,14 +281,15 @@ export default function ExecucoesPage() {
     finally { setGerandoPDF(null) }
   }
 
-  const handleProgredir = async (execucao) => {
-    if (!window.confirm(`Confirmar progressão de "${execucao.regime_inicial}" para "${execucao.regime_progressao}"?\n\nEssa ação documenta o deferimento judicial.`)) return
-    setProgredindo(execucao.id)
+  const handleProgredir = async () => {
+    if (!modalProgressao) return
+    setProgredindo(modalProgressao.id)
     try {
-      const res = await fetch(`${API_URL}/api/v1/execucoes/${execucao.id}/progredir`, {
+      const res = await fetch(`${API_URL}/api/v1/execucoes/${modalProgressao.id}/progredir`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
       })
       if (!res.ok) { const data = await res.json(); alert(data.detail || 'Erro'); return }
+      setModalProgressao(null)
       await carregar()
     } catch { alert('Erro ao registrar progressão') }
     finally { setProgredindo(null) }
@@ -282,6 +309,16 @@ export default function ExecucoesPage() {
     <div className={styles.root}>
       <div className={styles.bgPattern} />
       <Navbar showLinks />
+
+      {modalProgressao && (
+        <ModalConfirmacao
+          execucao={modalProgressao}
+          onConfirmar={handleProgredir}
+          onCancelar={() => setModalProgressao(null)}
+          loading={progredindo === modalProgressao.id}
+        />
+      )}
+
       <div className={styles.body}>
         <div className={styles.container}>
           <div className={styles.pageHeader}>
@@ -383,23 +420,21 @@ export default function ExecucoesPage() {
                     </div>
 
                     {progressaoVencida && e.regime_inicial !== 'Livramento Condicional' && e.regime_inicial !== 'Pena Extinta' && (
-                      <button className={styles.btnProgredir} onClick={() => handleProgredir(e)} disabled={progredindo === e.id}>
-                        {progredindo === e.id ? 'Registrando...' : `⬆ Registrar Progressão: ${e.regime_inicial} → ${e.regime_progressao}`}
+                      <button className={styles.btnProgredir} onClick={() => setModalProgressao(e)}>
+                        ⬆ Registrar Progressão: {e.regime_inicial} → {e.regime_progressao}
                       </button>
                     )}
 
-                    {progressaoVencida && <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>}
+                    {progressaoVencida && (
+                      <div className={styles.alertaBox}>⚠ Data de progressão já passou — verificar situação do apenado</div>
+                    )}
 
                     <div className={styles.acoesCard}>
                       <div className={styles.botoesAcoes}>
-                        <button
-                          className={`${styles.btnEditar} ${edicaoAberta === e.id ? styles.btnAtivoEditar : ''}`}
-                          onClick={() => toggleEdicao(e.id)} type="button">
+                        <button className={`${styles.btnEditar} ${edicaoAberta === e.id ? styles.btnAtivoEditar : ''}`} onClick={() => toggleEdicao(e.id)} type="button">
                           {edicaoAberta === e.id ? '▲ Fechar edição' : '✎ Editar execução'}
                         </button>
-                        <button
-                          className={`${styles.btnRemicao} ${remicaoAberta === e.id ? styles.btnAtivoRemicao : ''}`}
-                          onClick={() => toggleRemicao(e.id)} type="button">
+                        <button className={`${styles.btnRemicao} ${remicaoAberta === e.id ? styles.btnAtivoRemicao : ''}`} onClick={() => toggleRemicao(e.id)} type="button">
                           {remicaoAberta === e.id ? '▲ Fechar' : '+ Registrar Remição'}
                         </button>
                       </div>
@@ -407,7 +442,7 @@ export default function ExecucoesPage() {
                         <FormEdicao execucao={e} onAtualizado={carregar} onFechar={() => setEdicaoAberta(null)} />
                       )}
                       {remicaoAberta === e.id && (
-                        <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} onFechar={() => setRemicaoAberta(null)} />
+                        <FormRemicao execucaoId={e.id} onRemicaoAdicionada={carregar} />
                       )}
                     </div>
                   </div>
