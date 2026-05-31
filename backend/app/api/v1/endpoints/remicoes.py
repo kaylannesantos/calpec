@@ -33,58 +33,45 @@ def registrar_remicao(dados: RemicaoCreate, db: Session = Depends(get_db)):
     if not execucao:
         raise HTTPException(status_code=404, detail="Execução não encontrada")
 
-    # 1. Calcular dias remidos desta remição
     dias = calcular_dias_remidos(dados.tipo, dados.quantidade)
 
-    # 2. Somar remições ANTERIORES (antes de salvar a nova)
     total_anterior = db.query(func.sum(Remicao.dias_remidos)).filter(
         Remicao.execucao_id == dados.execucao_id
     ).scalar() or 0
 
     total_dias_remidos = total_anterior + dias
 
-    # 3. Salvar a remição
     remicao = Remicao(
         execucao_id=dados.execucao_id,
         tipo=dados.tipo,
         quantidade=dados.quantidade,
         dias_remidos=dias,
         data_referencia=dados.data_referencia,
+        data_inicio=dados.data_inicio,
+        data_fim=dados.data_fim,
         observacao=dados.observacao,
     )
     db.add(remicao)
 
-    # 4. Recalcular pena base (com detração)
     pena_total = pena_para_dias(execucao.pena_anos, execucao.pena_meses, execucao.pena_dias)
     dias_detracao = calcular_detracao(execucao.detracao_inicio, execucao.detracao_fim)
     pena_base = pena_total - dias_detracao
-
-    # 5. Pena efetiva após remições
     pena_efetiva = pena_base - total_dias_remidos
 
-    # 6. Recalcular data de progressão (lapso sobre pena_base menos dias remidos)
     percentual = calcular_percentual_progressao(
-        execucao.natureza_crime.value,
-        execucao.reincidente
+        execucao.natureza_crime.value, execucao.reincidente
     )
     lapso = int(pena_base * percentual)
     dias_para_progressao = lapso - total_dias_remidos
     nova_data_progressao = execucao.data_inicio_pena + timedelta(days=dias_para_progressao)
-
-    # 7. Recalcular data de término
     nova_data_termino = execucao.data_inicio_pena + timedelta(days=pena_efetiva)
-
-    # 8. Regime de progressão
     regime_progressao = determinar_regime_progressao(execucao.regime_inicial or 'Fechado')
 
-    # 9. Atualizar execução
     execucao.dias_remidos = total_dias_remidos
     execucao.data_termino = nova_data_termino
     execucao.data_progressao = nova_data_progressao
     execucao.regime_progressao = regime_progressao
     execucao.pena_total_dias = pena_base
-
-    print(f"[REMICAO] execucao_id={dados.execucao_id} | total_remido={total_dias_remidos} | lapso={lapso} | dias_progressao={dias_para_progressao} | nova_progressao={nova_data_progressao}")
 
     db.commit()
     db.refresh(remicao)
@@ -95,4 +82,4 @@ def registrar_remicao(dados: RemicaoCreate, db: Session = Depends(get_db)):
 def listar_remicoes(execucao_id: int, db: Session = Depends(get_db)):
     return db.query(Remicao).filter(
         Remicao.execucao_id == execucao_id
-    ).order_by(Remicao.data_referencia.desc()).all()
+    ).order_by(Remicao.data_referencia.desc(), Remicao.data_inicio.desc()).all()

@@ -4,6 +4,7 @@ import Navbar from '../components/layout/Navbar'
 import { gerarPDFExecucao } from '../utils/gerarPDF'
 import styles from './ExecucoesPage.module.css'
 import { API_URL } from '../services/api'
+import FormRemicao from '../components/FormRemicao'
 
 const ETAPAS = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento Condicional', 'Pena Extinta']
 const FILTROS = [
@@ -153,6 +154,7 @@ function FormEdicao({ execucao, onAtualizado, onFechar }) {
   )
 }
 
+/*
 function FormRemicao({ execucaoId, onRemicaoAdicionada }) {
   const [historico, setHistorico] = useState([])
   const [form, setForm] = useState({ tipo: 'trabalho', quantidade: '', data_referencia: '', observacao: '' })
@@ -237,7 +239,7 @@ function FormRemicao({ execucaoId, onRemicaoAdicionada }) {
       )}
     </div>
   )
-}
+}*/
 
 function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerandoPDF, setModalProgressao, carregar }) {
   const [aberto, setAberto] = useState(false)
