@@ -243,12 +243,20 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
   doc.text('CalPEC — Sistema Eletrônico para Cálculo do Processo de Execução Criminal', W / 2, alturaRodape + 7, { align: 'center' })
   doc.text('Conforme Lei de Execução Penal (LEP — Lei nº 7.210/1984) e Pacote Anticrime (Lei nº 13.964/2019)', W / 2, alturaRodape + 12, { align: 'center' })
 
-  // ─── VISUALIZAR OU BAIXAR ────────────────────────────
+// ─── VISUALIZAR OU BAIXAR ────────────────────────────
+  const nomeArquivo = `CalPEC_${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
   if (visualizar) {
-    const url = doc.output('bloburl')
-    window.open(url, '_blank')
+    const blob = doc.output('blob')
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.download = nomeArquivo
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   } else {
-    const nomeArquivo = `CalPEC_${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
     doc.save(nomeArquivo)
   }
 }
