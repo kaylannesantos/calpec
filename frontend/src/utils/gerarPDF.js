@@ -12,6 +12,12 @@ function formatarDataHoje() {
   })
 }
 
+function formatarPeriodo(r) {
+  if (r.data_inicio && r.data_fim) return `${formatarData(r.data_inicio)} a ${formatarData(r.data_fim)}`
+  if (r.data_inicio) return `a partir de ${formatarData(r.data_inicio)}`
+  return formatarData(r.data_referencia)
+}
+
 export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar = false }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const W = 210
@@ -134,7 +140,7 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
   y += 20
 
   // ─── ETAPAS VISUAIS ──────────────────────────────────
-  const etapas = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Extinta']
+  const etapas = ['Fechado', 'Semiaberto', 'Aberto', 'Livramento', 'Pena Extinta']
   const regimeAtual = execucao.regime_inicial || 'Fechado'
   const etapaAtual = etapas.findIndex(e => regimeAtual.includes(e.split(' ')[0]))
   const etapaW = (W - margem * 2) / etapas.length
@@ -144,11 +150,8 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
     const feita = i < etapaAtual
     const atual = i === etapaAtual
 
-    if (feita || atual) {
-      doc.setFillColor(...dourado)
-    } else {
-      doc.setFillColor(...cinzaClaro)
-    }
+    if (feita || atual) doc.setFillColor(...dourado)
+    else doc.setFillColor(...cinzaClaro)
     doc.circle(cx, y + 3, 3, 'F')
 
     if (i < etapas.length - 1) {
@@ -174,38 +177,48 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
     doc.rect(margem, y + 2, W - margem * 2, 0.3, 'F')
     y += 8
 
+    // Cabeçalho da tabela
     doc.setFillColor(240, 242, 245)
     doc.rect(margem, y, W - margem * 2, 7, 'F')
     doc.setTextColor(...cinza)
     doc.setFontSize(7)
     doc.setFont('helvetica', 'bold')
     doc.text('TIPO', margem + 3, y + 5)
-    doc.text('QUANTIDADE', margem + 35, y + 5)
-    doc.text('DIAS REMIDOS', margem + 80, y + 5)
-    doc.text('DATA', margem + 120, y + 5)
-    doc.text('OBSERVAÇÃO', margem + 148, y + 5)
+    doc.text('QTD', margem + 30, y + 5)
+    doc.text('DIAS', margem + 50, y + 5)
+    doc.text('PERÍODO', margem + 70, y + 5)
+    doc.text('OBSERVAÇÃO', margem + 130, y + 5)
     y += 7
 
     remicoes.forEach((r, i) => {
+      const obsTexto = r.observacao || '—'
+      const obsLinhas = doc.splitTextToSize(obsTexto, 48)
+      const alturaRow = Math.max(6, obsLinhas.length * 4.5)
+
       if (i % 2 === 0) {
         doc.setFillColor(250, 251, 252)
-        doc.rect(margem, y, W - margem * 2, 6, 'F')
+        doc.rect(margem, y, W - margem * 2, alturaRow, 'F')
       }
+
       doc.setTextColor(...escuro)
       doc.setFontSize(7.5)
       doc.setFont('helvetica', 'normal')
       doc.text(r.tipo, margem + 3, y + 4.5)
-      doc.text(String(r.quantidade), margem + 35, y + 4.5)
+      doc.text(String(r.quantidade), margem + 30, y + 4.5)
+
       doc.setTextColor(...dourado)
       doc.setFont('helvetica', 'bold')
-      doc.text(`-${r.dias_remidos}d`, margem + 80, y + 4.5)
+      doc.text(`-${r.dias_remidos}d`, margem + 50, y + 4.5)
+
       doc.setTextColor(...escuro)
       doc.setFont('helvetica', 'normal')
-      doc.text(formatarData(r.data_referencia), margem + 120, y + 4.5)
-      doc.text(r.observacao || '—', margem + 148, y + 4.5)
-      y += 6
+      doc.text(formatarPeriodo(r), margem + 70, y + 4.5)
+      doc.text(obsLinhas, margem + 130, y + 4.5)
+
+      y += alturaRow
     })
 
+    // Total
     y += 2
     doc.setFillColor(...escuro)
     doc.rect(margem, y, W - margem * 2, 8, 'F')
@@ -235,7 +248,7 @@ export function gerarPDFExecucao({ apenado, execucao, remicoes = [], visualizar 
     const url = doc.output('bloburl')
     window.open(url, '_blank')
   } else {
-    const nomeArquivo = `${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
+    const nomeArquivo = `CalPEC_${apenado.numero_execucao.replace(/[\/\\]/g, '-')}_${new Date().toISOString().split('T')[0]}.pdf`
     doc.save(nomeArquivo)
   }
 }
