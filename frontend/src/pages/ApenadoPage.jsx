@@ -13,13 +13,17 @@ export default function ApenadoPage() {
   const [apenados, setApenados] = useState([])
   const [carregando, setCarregando] = useState(true)
   const [aba, setAba] = useState('lista')
+  const [editando, setEditando] = useState(null)
+  const [formEdicao, setFormEdicao] = useState({ nome: '', numero_execucao: '', data_nascimento: '' })
+  const [erroEdicao, setErroEdicao] = useState('')
+  const [sucessoEdicao, setSucessoEdicao] = useState('')
+  const [loadingEdicao, setLoadingEdicao] = useState(false)
 
   const carregarApenados = async () => {
     setCarregando(true)
     try {
       const res = await fetch(`${API_URL}/api/v1/apenados/`)
-      const data = await res.json()
-      setApenados(data)
+      setApenados(await res.json())
     } catch {} finally { setCarregando(false) }
   }
 
@@ -45,6 +49,34 @@ export default function ApenadoPage() {
     } catch (err) { setErro(err.message) } finally { setLoading(false) }
   }
 
+  const abrirEdicao = (a) => {
+    setEditando(a.id)
+    setFormEdicao({ nome: a.nome, numero_execucao: a.numero_execucao, data_nascimento: a.data_nascimento })
+    setErroEdicao(''); setSucessoEdicao('')
+  }
+
+  const fecharEdicao = () => {
+    setEditando(null)
+    setErroEdicao(''); setSucessoEdicao('')
+  }
+
+  const handleSalvarEdicao = async (e, id) => {
+    e.preventDefault()
+    setErroEdicao(''); setSucessoEdicao(''); setLoadingEdicao(true)
+    try {
+      const res = await fetch(`${API_URL}/api/v1/apenados/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formEdicao),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.detail || 'Erro ao atualizar')
+      setSucessoEdicao('Apenado atualizado com sucesso!')
+      carregarApenados()
+      setTimeout(() => { fecharEdicao() }, 1500)
+    } catch (err) { setErroEdicao(err.message) } finally { setLoadingEdicao(false) }
+  }
+
   const formatarData = (d) => d ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR') : '-'
 
   return (
@@ -61,6 +93,7 @@ export default function ApenadoPage() {
             </div>
           </div>
           <div className={styles.divider} />
+
           {aba === 'lista' && (
             <div className={styles.lista}>
               {carregando ? <p className={styles.vazio}>Carregando...</p> : apenados.length === 0 ? (
@@ -70,16 +103,50 @@ export default function ApenadoPage() {
                 </div>
               ) : apenados.map(a => (
                 <div key={a.id} className={styles.item}>
-                  <div className={styles.itemInfo}>
-                    <span className={styles.itemNome}>{a.nome}</span>
-                    <span className={styles.itemDetalhe}>Nº {a.numero_execucao}</span>
-                    <span className={styles.itemDetalhe}>Nascimento: {formatarData(a.data_nascimento)}</span>
-                  </div>
-                  <button className={styles.btnVer} onClick={() => navigate(`/execucoes?apenado_id=${a.id}&nome=${encodeURIComponent(a.nome)}`)}>Ver execuções →</button>
+                  {editando === a.id ? (
+                    <form onSubmit={(e) => handleSalvarEdicao(e, a.id)} className={styles.formEdicao}>
+                      <p className={styles.edicaoTitulo}>Editar apenado</p>
+                      <div className={styles.edicaoGrid}>
+                        <div className={styles.field}>
+                          <label className={styles.label}>Nome completo</label>
+                          <input className={styles.input} value={formEdicao.nome} onChange={e => setFormEdicao({...formEdicao, nome: e.target.value})} required />
+                        </div>
+                        <div className={styles.field}>
+                          <label className={styles.label}>Número da execução</label>
+                          <input className={styles.input} value={formEdicao.numero_execucao} onChange={e => setFormEdicao({...formEdicao, numero_execucao: e.target.value})} required />
+                        </div>
+                        <div className={styles.field}>
+                          <label className={styles.label}>Data de nascimento</label>
+                          <input className={styles.input} type="date" value={formEdicao.data_nascimento} onChange={e => setFormEdicao({...formEdicao, data_nascimento: e.target.value})} required />
+                        </div>
+                      </div>
+                      {erroEdicao && <p className={styles.erro}>{erroEdicao}</p>}
+                      {sucessoEdicao && <p className={styles.sucesso}>{sucessoEdicao}</p>}
+                      <div className={styles.edicaoBotoes}>
+                        <button type="button" className={styles.btnCancelar} onClick={fecharEdicao}>Cancelar</button>
+                        <button type="submit" className={styles.btn} disabled={loadingEdicao}>
+                          {loadingEdicao ? 'Salvando...' : 'Salvar'}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <>
+                      <div className={styles.itemInfo}>
+                        <span className={styles.itemNome}>{a.nome}</span>
+                        <span className={styles.itemDetalhe}>Nº {a.numero_execucao}</span>
+                        <span className={styles.itemDetalhe}>Nascimento: {formatarData(a.data_nascimento)}</span>
+                      </div>
+                      <div className={styles.itemAcoes}>
+                        <button className={styles.btnEditar} onClick={() => abrirEdicao(a)}>✎ Editar</button>
+                        <button className={styles.btnVer} onClick={() => navigate(`/execucoes?apenado_id=${a.id}&nome=${encodeURIComponent(a.nome)}`)}>Ver execuções →</button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
           )}
+
           {aba === 'novo' && (
             <div className={styles.card}>
               <form onSubmit={handleSubmit}>

@@ -3,32 +3,41 @@
 .body { flex: 1; display: flex; justify-content: center; padding: 36px 24px; position: relative; z-index: 2; }
 .container { width: 100%; max-width: 1100px; }
 .pageHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-.title { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 600; color: #e8dcc8; }
+.title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: #e8dcc8; }
 .abas { display: flex; gap: 8px; }
-.aba { background: transparent; border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.45); cursor: pointer; transition: all 0.2s; }
+.aba { background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 8px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
 .aba:hover { border-color: #c9a96e; color: #c9a96e; }
 .abaAtiva { border-color: #c9a96e; color: #c9a96e; background: rgba(201,169,110,0.08); }
 .divider { height: 0.5px; background: rgba(255,255,255,0.08); margin-bottom: 24px; }
 .lista { display: flex; flex-direction: column; gap: 10px; }
-.item { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 16px 20px; transition: border-color 0.2s; gap: 12px; }
-.item:hover { border-color: rgba(201,169,110,0.3); }
-.itemInfo { display: flex; flex-direction: column; gap: 4px; }
-.itemNome { font-size: 15px; font-weight: 500; color: #e8dcc8; }
+.item { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 20px; transition: border-color 0.2s; }
+.item:hover { border-color: rgba(201,169,110,0.2); }
+.itemInfo { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; flex: 1; }
+.itemNome { font-size: 14px; font-weight: 500; color: #e8dcc8; }
 .itemDetalhe { font-size: 12px; color: rgba(255,255,255,0.4); }
-.btnVer { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+.itemAcoes { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+.btnVer { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 7px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
 .btnVer:hover { background: rgba(201,169,110,0.1); }
-.vazioBox { text-align: center; padding: 48px 24px; }
-.vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
-.btnSecundario { background: transparent; border: 0.5px solid #c9a96e; color: #c9a96e; border-radius: 8px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: background 0.2s; }
-.btnSecundario:hover { background: rgba(201,169,110,0.1); }
+.btnEditar { background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 7px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.btnEditar:hover { border-color: #c9a96e; color: #c9a96e; }
+.formEdicao { padding: 4px 0; }
+.edicaoTitulo { font-size: 11px; color: #c9a96e; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; font-weight: 500; }
+.edicaoGrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.edicaoBotoes { display: flex; gap: 10px; justify-content: flex-end; }
+.btnCancelar { background: transparent; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.4); border-radius: 8px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btnCancelar:hover { border-color: #f08080; color: #f08080; }
 .card { background: rgba(255,255,255,0.04); border: 0.5px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 28px 32px; }
 .field { margin-bottom: 16px; }
-.label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.07em; text-transform: uppercase; display: block; margin-bottom: 7px; }
+.label { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 0.07em; text-transform: uppercase; display: block; margin-bottom: 6px; }
 .input { width: 100%; background: rgba(255,255,255,0.05); border: 0.5px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 14px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #e8dcc8; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
 .input::placeholder { color: rgba(255,255,255,0.2); }
 .input:focus { border-color: #c9a96e; }
 .erro { font-size: 13px; color: #f08080; margin-bottom: 12px; }
 .sucesso { font-size: 13px; color: #7ec88a; margin-bottom: 12px; }
-.btn { width: 100%; margin-top: 8px; background: #c9a96e; border: none; border-radius: 8px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: #0f1923; cursor: pointer; transition: background 0.2s; }
+.btn { background: #c9a96e; border: none; border-radius: 8px; padding: 10px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: #0f1923; cursor: pointer; transition: background 0.2s; }
 .btn:hover { background: #d4b87a; }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.vazioBox { text-align: center; padding: 48px 24px; }
+.vazio { font-size: 14px; color: rgba(255,255,255,0.3); margin-bottom: 16px; }
+.btnSecundario { background: transparent; border: 0.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.5); border-radius: 8px; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.btnSecundario:hover { border-color: #c9a96e; color: #c9a96e; }
