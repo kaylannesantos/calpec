@@ -283,7 +283,6 @@ function CardExecucao({ e, getNomeApenado, formatarData, handleGerarPDF, gerando
           <button className={styles.btnPDFDownload} onClick={() => handleGerarPDF(e, false)} disabled={gerandoPDF === e.id}>
             ↓ PDF
           </button>
-          <span className={styles.cardId}>#{e.id}</span>
         </div>
       </div>
 

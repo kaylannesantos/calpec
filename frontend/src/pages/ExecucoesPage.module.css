@@ -41,7 +41,6 @@
 .cardToggle { font-size: 11px; color: rgba(255,255,255,0.25); }
 .cardTags { display: flex; gap: 6px; flex-wrap: wrap; }
 .cardAcoes { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.cardId { font-size: 12px; color: rgba(255,255,255,0.2); }
 .cardDetalhe { margin-top: 16px; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 16px; }
 .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
 .badgeFechado { background: rgba(201,169,110,0.12); color: #c9a96e; }
