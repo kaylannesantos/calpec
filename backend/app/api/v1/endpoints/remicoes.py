@@ -27,6 +27,15 @@ def calcular_dias_remidos(tipo: str, quantidade: int) -> int:
     return 0
 
 
+def calcular_remicao_inicial(execucao: Execucao) -> int:
+    """Calcula os dias remidos da remição inicial da execução."""
+    dias = 0
+    dias += (execucao.dias_trabalhados or 0) // 3
+    dias += (execucao.horas_estudo or 0) // 12
+    dias += (execucao.obras_lidas or 0) * 4
+    return dias
+
+
 @router.post("/", response_model=RemicaoResponse, status_code=201)
 def registrar_remicao(dados: RemicaoCreate, db: Session = Depends(get_db)):
     execucao = db.query(Execucao).filter(Execucao.id == dados.execucao_id).first()
@@ -35,11 +44,13 @@ def registrar_remicao(dados: RemicaoCreate, db: Session = Depends(get_db)):
 
     dias = calcular_dias_remidos(dados.tipo, dados.quantidade)
 
-    total_anterior = db.query(func.sum(Remicao.dias_remidos)).filter(
+    # Soma remições da tabela + remição inicial da execução
+    total_tabela = db.query(func.sum(Remicao.dias_remidos)).filter(
         Remicao.execucao_id == dados.execucao_id
     ).scalar() or 0
 
-    total_dias_remidos = total_anterior + dias
+    remicao_inicial = calcular_remicao_inicial(execucao)
+    total_dias_remidos = total_tabela + dias + remicao_inicial
 
     remicao = Remicao(
         execucao_id=dados.execucao_id,
